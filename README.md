@@ -298,21 +298,27 @@ Edit `src/styles.css` for global styles and Tailwind configuration.
 ## 🎯 When to Use This Boilerplate
 
 ✅ **App-type websites** (vs document-type websites)
+
 ✅ **Projects needing auth + protected routes**
+
 ✅ **Applications that may need mobile/native versions later**
+
 ✅ **Teams wanting clean separation between SSR shell and SPA**
+
 ✅ **Projects requiring type safety throughout the stack**
 
 ## 🚫 When NOT to Use This Boilerplate
 
 ❌ **Static websites** (use Next.js, Astro, etc.)
+
 ❌ **Content-heavy sites** (use traditional SSR)
+
 ❌ **Simple landing pages** (overkill for basic sites)
 
 ## 📚 Learning Resources
 
 - [TanStack Start Docs](https://tanstack.com/start/latest)
-- [oRPC Documentation](https://orpc.js.org/)
+- [oRPC Documentation](https://orpc.dev/)
 - [Better Auth Docs](https://www.better-auth.com/)
 - [Drizzle ORM Docs](https://orm.drizzle.team/)
 
@@ -326,10 +332,6 @@ This boilerplate is designed to be minimal and opinionated. Feel free to:
 - Adapt the shell pattern to your needs
 
 ## 📝 License
-
-MIT License - Free to use, modify, and distribute.
-
----
 
 > "Perfection is achieved not when there is nothing more to add, but when there is nothing left to take away." - Antoine de Saint-Exupéry
 
