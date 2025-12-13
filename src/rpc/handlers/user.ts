@@ -1,8 +1,8 @@
-import { authedProcedure } from "../base";
-import { db } from "@/lib/db";
-import { user as userTable } from "@/lib/db/schema/auth.schema";
 import { count, eq } from "drizzle-orm";
 import { z } from "zod";
+import { db } from "@/lib/db";
+import { user as userTable } from "@/lib/db/schema/auth.schema";
+import { authedProcedure } from "../base";
 
 export const listUsers = authedProcedure
   .input(

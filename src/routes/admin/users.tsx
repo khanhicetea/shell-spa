@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import {
   type ColumnDef,
   flexRender,
@@ -6,8 +6,10 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import type { UserWithRole } from "better-auth/plugins";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
 import * as React from "react";
+import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { DataTablePagination } from "@/components/data-table/pagination";
 import { Button } from "@/components/ui/button";
@@ -28,6 +30,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
   Table,
   TableBody,
   TableCell,
@@ -35,6 +55,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import authClient from "@/lib/auth/auth-client";
 import type { Outputs } from "@/rpc/types";
 
 export type User = Outputs["user"]["listUsers"]["users"][number];
@@ -124,6 +145,7 @@ function UsersPage() {
   } = Route.useLoaderData();
   const [rowSelection, setRowSelection] = React.useState({});
   const navigate = Route.useNavigate();
+  const router = useRouter();
 
   const table = useReactTable({
     data: users || [],
@@ -144,10 +166,17 @@ function UsersPage() {
             <CardTitle>Users</CardTitle>
             <CardDescription>Manage user accounts</CardDescription>
           </div>
-          <Button size="sm" className="gap-1">
-            <PlusCircle className="h-4 w-4" />
-            <span>Add User</span>
-          </Button>
+          <CreateUserForm
+            trigger={
+              <Button size="sm" className="gap-1">
+                <PlusCircle className="h-4 w-4" />
+                <span>Add User</span>
+              </Button>
+            }
+            onSuccess={(user) => {
+              router.invalidate();
+            }}
+          />
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="overflow-hidden rounded-md border">
@@ -202,5 +231,115 @@ function UsersPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function CreateUserForm({
+  trigger,
+  onSuccess,
+}: {
+  trigger: React.ReactNode;
+  onSuccess: (user: UserWithRole) => void;
+}) {
+  const [open, setOpen] = React.useState(false);
+
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+      name: "",
+      role: "user",
+    },
+  });
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger asChild>{trigger}</SheetTrigger>
+      <SheetContent>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(async (data) => {
+              const res = await authClient.admin.createUser({
+                email: data.email,
+                password: data.password,
+                name: data.name,
+                role: data.role as "user" | "admin",
+              });
+
+              if (res.error === null) {
+                setOpen(false);
+                onSuccess(res.data.user);
+              }
+            })}
+          >
+            <SheetHeader>
+              <SheetTitle>Create new user</SheetTitle>
+            </SheetHeader>
+            <div className="grid flex-1 auto-rows-min gap-6 px-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter password" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>User role</FormLabel>
+                    <FormControl>
+                      <NativeSelect onChange={field.onChange} value={field.value}>
+                        <NativeSelectOption value="user">User</NativeSelectOption>
+                        <NativeSelectOption value="admin">Admin</NativeSelectOption>
+                      </NativeSelect>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <SheetFooter className="flex flex-row justify-end">
+              <Button type="submit">
+                {form.formState.isSubmitting ? "Saving ..." : "Save"}
+              </Button>
+            </SheetFooter>
+          </form>
+        </Form>
+      </SheetContent>
+    </Sheet>
   );
 }
