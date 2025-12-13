@@ -16,7 +16,7 @@
       "!**/*.generated.js",
       "!**/components/ui",
       "!!**/dist",
-      "!**/routeTree.gen.ts"
+      "!**/routeTree.gen.ts",
       "!**/styles.css"
     ],
     "ignoreUnknown": false

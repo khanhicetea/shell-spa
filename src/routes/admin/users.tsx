@@ -1,4 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
+import {
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
+import { MoreHorizontal, PlusCircle } from "lucide-react";
+import * as React from "react";
+import * as z from "zod";
+import { DataTablePagination } from "@/components/data-table/pagination";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,23 +18,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { PlusCircle, MoreHorizontal } from "lucide-react";
-import * as React from "react";
-import {
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  useReactTable,
-  type ColumnDef,
-} from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
@@ -33,9 +27,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import * as z from "zod";
-import { DataTablePagination } from "@/components/data-table/pagination";
-import { Outputs } from "@/rpc/types";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import type { Outputs } from "@/rpc/types";
 
 export type User = Outputs["user"]["listUsers"]["users"][number];
 

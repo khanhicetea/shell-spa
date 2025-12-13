@@ -4,6 +4,8 @@ import { getRequest } from "@tanstack/react-start/server";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
+import { admin } from "better-auth/plugins";
+import { ac, admin as adminRole, user as userRole } from "./permissions";
 
 const getAuthConfig = createServerOnlyFn(() =>
   betterAuth({
@@ -16,7 +18,16 @@ const getAuthConfig = createServerOnlyFn(() =>
     }),
 
     // https://www.better-auth.com/docs/integrations/tanstack#usage-tips
-    plugins: [tanstackStartCookies()],
+    plugins: [
+      tanstackStartCookies(),
+      admin({
+        ac,
+        roles: {
+          admin: adminRole,
+          user: userRole,
+        },
+      }),
+    ],
 
     // https://www.better-auth.com/docs/concepts/session-management#session-caching
     session: {
