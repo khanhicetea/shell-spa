@@ -37,7 +37,7 @@ import * as z from "zod";
 import { DataTablePagination } from "@/components/data-table/pagination";
 import { Outputs } from "@/rpc/types";
 
-export type User = Outputs["user"]["getAllUsers"]["users"][number];
+export type User = Outputs["user"]["listUsers"]["users"][number];
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -105,7 +105,7 @@ export const Route = createFileRoute("/admin/users")({
   }),
   loaderDeps: ({ search }) => ({ page: search.page }),
   loader: async ({ deps, context }) => {
-    const data = await context.rpcClient.user.getAllUsers({ page: deps.page });
+    const data = await context.rpcClient.user.listUsers({ page: deps.page });
 
     return {
       ...data,

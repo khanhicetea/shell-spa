@@ -4,7 +4,7 @@ import { user as userTable } from "@/lib/db/schema/auth.schema";
 import { count, eq } from "drizzle-orm";
 import { z } from "zod";
 
-export const getAllUsers = authedProcedure
+export const listUsers = authedProcedure
   .input(
     z.object({
       page: z.number().int().positive().catch(1),
