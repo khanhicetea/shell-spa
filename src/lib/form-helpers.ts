@@ -1,5 +1,5 @@
 import { ORPCError } from "@orpc/client";
-import { FieldPath, FieldValues, UseFormSetError } from "react-hook-form";
+import type { FieldPath, FieldValues, UseFormSetError } from "react-hook-form";
 import { toast } from "sonner";
 
 export const handleFormError = <TFieldValues extends FieldValues>(

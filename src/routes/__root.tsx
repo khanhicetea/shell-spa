@@ -27,8 +27,9 @@ export const Route = createRootRouteWithContext<{
   beforeLoad: async ({ context }) => {
     // Shell Pattern: SSR shell data via RPC with React Query caching
     // This runs on the server and provides minimal data needed for the app shell
-    const shell =
-      await context.queryClient.ensureQueryData(shellQueryOptions());
+    const shell = await context.queryClient.ensureQueryData(
+      shellQueryOptions(),
+    );
 
     // Prefetch user data but don't await it - let client handle it
     // This ensures the shell loads quickly while user data loads in the background

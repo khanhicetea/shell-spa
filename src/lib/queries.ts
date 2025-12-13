@@ -6,7 +6,7 @@ export const authQueryOptions = () =>
   queryOptions({
     queryKey: ["user"],
     queryFn: async ({ signal }) => {
-      const user = await rpcClient.user.getCurrentUser(
+      const user = await rpcClient.auth.getCurrentUser(
         {},
         {
           signal,
@@ -33,5 +33,5 @@ export const shellQueryOptions = () =>
     staleTime: 5 * 60 * 1000, // 5 minutes - shell data doesn't change often
   });
 
-export type AuthQueryResult = Outputs["user"]["getCurrentUser"];
+export type AuthQueryResult = Outputs["auth"]["getCurrentUser"];
 export type ShellQueryResult = Outputs["app"]["shellData"];
