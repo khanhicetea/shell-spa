@@ -15,15 +15,10 @@ export const Route = createFileRoute("/(auth)/signup")({
 
 function SignupForm() {
   const { redirectUrl } = Route.useRouteContext();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const { mutate: signupMutate, isPending } = useMutation({
-    mutationFn: async (data: {
-      name: string;
-      email: string;
-      password: string;
-    }) => {
+    mutationFn: async (data: { name: string; email: string; password: string }) => {
       await authClient.signUp.email(
         {
           ...data,
@@ -34,10 +29,7 @@ function SignupForm() {
             toast.error(error.message || "An error occurred while signing up.");
           },
           onSuccess: () => {
-            queryClient.removeQueries({
-              queryKey: authQueryOptions().queryKey,
-            });
-            navigate({ to: redirectUrl });
+            navigate({ to: redirectUrl, reloadDocument: true });
           },
         },
       );
@@ -69,10 +61,7 @@ function SignupForm() {
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
-            <a
-              href="#"
-              className="flex flex-col items-center gap-2 font-medium"
-            >
+            <a href="#" className="flex flex-col items-center gap-2 font-medium">
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <GalleryVerticalEnd className="size-6" />
               </div>
@@ -125,12 +114,7 @@ function SignupForm() {
                 required
               />
             </div>
-            <Button
-              type="submit"
-              className="mt-2 w-full"
-              size="lg"
-              disabled={isPending}
-            >
+            <Button type="submit" className="mt-2 w-full" size="lg" disabled={isPending}>
               {isPending && <LoaderCircle className="animate-spin" />}
               {isPending ? "Signing up..." : "Sign up"}
             </Button>

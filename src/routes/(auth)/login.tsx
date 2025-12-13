@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import authClient from "@/lib/auth/auth-client";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GalleryVerticalEnd, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ export const Route = createFileRoute("/(auth)/login")({
 });
 
 function LoginForm() {
+  const navigate = Route.useNavigate();
   const { redirectUrl } = Route.useRouteContext();
 
   const { mutate: emailLoginMutate, isPending } = useMutation({
@@ -26,12 +27,9 @@ function LoginForm() {
           onError: ({ error }) => {
             toast.error(error.message || "An error occurred while signing in.");
           },
-          // better-auth seems to trigger a hard navigation on login,
-          // so we don't have to revalidate & navigate ourselves
-          // onSuccess: () => {
-          //   queryClient.removeQueries({ queryKey: authQueryOptions().queryKey });
-          //   navigate({ to: redirectUrl });
-          // },
+          onSuccess: () => {
+            navigate({ to: redirectUrl, reloadDocument: true });
+          },
         },
       ),
   });
@@ -54,10 +52,7 @@ function LoginForm() {
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
-            <a
-              href="#"
-              className="flex flex-col items-center gap-2 font-medium"
-            >
+            <a href="#" className="flex flex-col items-center gap-2 font-medium">
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <GalleryVerticalEnd className="size-6" />
               </div>
@@ -88,12 +83,7 @@ function LoginForm() {
                 required
               />
             </div>
-            <Button
-              type="submit"
-              className="mt-2 w-full"
-              size="lg"
-              disabled={isPending}
-            >
+            <Button type="submit" className="mt-2 w-full" size="lg" disabled={isPending}>
               {isPending && <LoaderCircle className="animate-spin" />}
               {isPending ? "Logging in..." : "Login"}
             </Button>
