@@ -20,6 +20,9 @@ function HomePage() {
         <p className="text-muted-foreground max-w-md">
           A minimal starter with SSR shell for auth and SPA for everything else
         </p>
+        <Button type="button" asChild className="w-fit" size="lg">
+          <Link to="/hello-form">Go to Hello Form</Link>
+        </Button>
       </div>
 
       <Suspense fallback={<div className="py-6">Loading user...</div>}>
