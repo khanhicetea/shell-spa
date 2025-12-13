@@ -17,6 +17,7 @@
       "!**/components/ui",
       "!!**/dist",
       "!**/routeTree.gen.ts"
+      "!**/styles.css"
     ],
     "ignoreUnknown": false
   },

@@ -1,13 +1,35 @@
 import { authedProcedure } from "../base";
 import { db } from "@/lib/db";
 import { user as userTable } from "@/lib/db/schema/auth.schema";
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { z } from "zod";
 
-export const getAllUsers = authedProcedure.handler(async () => {
-  const users = await db.query.user.findMany();
-  return users;
-});
+export const getAllUsers = authedProcedure
+  .input(
+    z.object({
+      page: z.number().int().positive().catch(1),
+    }),
+  )
+  .handler(async ({ input }) => {
+    const { page } = input;
+    const limit = 10;
+    const offset = (page - 1) * limit;
+
+    const [users, totalCountResult] = await Promise.all([
+      db.query.user.findMany({
+        limit,
+        offset,
+      }),
+      db.select({ count: count() }).from(userTable),
+    ]);
+
+    return {
+      users,
+      pageSize: limit,
+      totalCount: totalCountResult[0]?.count ?? 0,
+      pageCount: Math.ceil((totalCountResult[0]?.count ?? 0) / limit),
+    };
+  });
 
 export const getUserById = authedProcedure
   .input(z.object({ id: z.string() }))
