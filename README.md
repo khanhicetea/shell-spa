@@ -63,8 +63,10 @@ shell-spa/
 │   │   ├── db/              # Database configuration
 │   │   └── orpc.ts          # RPC client setup
 │   ├── routes/             # File-based routing
-│   │   ├── (auth-pages)/    # Public auth pages
-│   │   ├── (authenticated)/ # Protected routes
+│   │   ├── (auth)/          # Public auth pages
+│   │   ├── (user)/          # Protected routes
+│   │   ├── (test)/          # Test routes
+│   │   ├── api/             # API endpoints
 │   │   └── __root.tsx       # Shell implementation
 │   └── rpc/                # RPC procedures
 ├── public/                 # Static assets
@@ -78,27 +80,46 @@ shell-spa/
 **`src/routes/__root.tsx`** - The heart of the shell pattern:
 
 ```typescript
-export type ShellData = {
-  appName: string;
-  appVersion: string;
-  theme: "light" | "dark" | "system";
-  environment: "development" | "production";
-};
-
+// Shell data is fetched via RPC and cached with React Query
 beforeLoad: async ({ context }) => {
-  // SSR only essential shell data
-  const shellData: ShellData = {
-    appName: "Shell SPA",
-    appVersion: "1.0.0",
-    theme: "system",
-    environment: process.env.NODE_ENV === "production" ? "production" : "development",
-  };
+  // SSR shell data via RPC with React Query caching
+  const shell = await context.queryClient.ensureQueryData(shellQueryOptions());
 
-  // Prefetch user data (non-blocking)
-  context.queryClient.prefetchQuery(authQueryOptions());
+  // Prefetch user data but don't await it - let client handle it
+  context.queryClient.setQueryData(authQueryOptions().queryKey, shell.user);
 
-  return { shellData };
+  return { shell };
 };
+```
+
+The shell data structure is defined in `src/rpc/handlers/app.ts`:
+
+```typescript
+export const shellData = baseProcedure.handler(async ({ context }) => {
+  return {
+    app: {
+      name: "Shell SPA",
+      version: "1.0.0",
+      environment: process.env.NODE_ENV === "production" ? "production" : "development",
+      theme: getCookie("theme") || "system",
+    },
+    user: context.session?.user || null,
+  };
+});
+```
+
+And the query options are defined in `src/lib/queries.ts`:
+
+```typescript
+export const shellQueryOptions = () =>
+  queryOptions({
+    queryKey: ["shell"],
+    queryFn: async ({ signal }) => {
+      const shellData = await rpcClient.app.shellData({}, { signal });
+      return shellData;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes - shell data doesn't change often
+  });
 ```
 
 ### 2. Authentication Flow
@@ -107,16 +128,53 @@ beforeLoad: async ({ context }) => {
 graph TD
   A[User Request] --> B[Root Route]
   B --> C[SSR Shell Data]
-  C --> D[Prefetch User (non-blocking)]
+  C --> D[Prefetch User non-blocking]
   D --> E[Render Shell]
   E --> F[Client Hydration]
   F --> G[SPA Takes Over]
 ```
 
-### 3. Protected Routes
+### 3. Router Configuration
+
+The router is configured in `src/router.tsx` with:
+
+- **React Query Integration**: For data fetching and caching
+- **SSR-Query Integration**: For server-side rendering with query support
+- **Default Error Handling**: Custom catch boundary and not found components
+- **Scroll Restoration**: Automatic scroll position management
+- **Structural Sharing**: Optimized component rendering
+
+Key configuration:
 
 ```typescript
-// src/routes/(authenticated)/route.tsx
+// src/router.tsx
+const router = createRouter({
+  routeTree,
+  context: {
+    queryClient,
+    rpcClient,
+    user: null,
+  },
+  defaultPreload: "intent",
+  defaultPreloadStaleTime: 0,
+  defaultErrorComponent: DefaultCatchBoundary,
+  defaultNotFoundComponent: DefaultNotFound,
+  scrollRestoration: true,
+  defaultStructuralSharing: true,
+});
+
+setupRouterSsrQueryIntegration({
+  router,
+  queryClient,
+  handleRedirects: true,
+  wrapQueryClient: true,
+});
+```
+
+### 4. Protected Routes
+
+```typescript
+// src/routes/(user)/route.tsx
 beforeLoad: async ({ context }) => {
   const user = await context.queryClient.ensureQueryData({
     ...authQueryOptions(),
@@ -199,7 +257,8 @@ export const rpcRouter = {
 ### Add New Pages
 
 1. **Public Page**: Add to `src/routes/`
-2. **Protected Page**: Add to `src/routes/(authenticated)/`
+2. **Protected Page**: Add to `src/routes/(user)/`
+3. **Test Page**: Add to `src/routes/(test)/`
 
 ### Add New RPC Procedures
 
