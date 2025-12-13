@@ -2,8 +2,8 @@ import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
 import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 
-import { DefaultCatchBoundary } from "@/components/default-catch-boundary";
-import { DefaultNotFound } from "@/components/default-not-found";
+import { DefaultCatchBoundary } from "@/components/app/default-catch-boundary";
+import { DefaultNotFound } from "@/components/app/default-not-found";
 import { rpcClient } from "./lib/orpc";
 import { routeTree } from "./routeTree.gen";
 

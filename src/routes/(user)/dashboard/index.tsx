@@ -1,4 +1,4 @@
-import { SignOutButton } from "@/components/sign-out-button";
+import { SignOutButton } from "@/components/app/sign-out-button";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(user)/dashboard/")({

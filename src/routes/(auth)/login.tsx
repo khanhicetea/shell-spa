@@ -1,4 +1,4 @@
-import { SignInSocialButton } from "@/components/sign-in-social-button";
+import { SignInSocialButton } from "@/components/app/sign-in-social-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
