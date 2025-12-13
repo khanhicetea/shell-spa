@@ -1,0 +1,185 @@
+# LLM Rules and Context
+
+## Project Overview
+
+This is a minimal project implementing the Shell SPA pattern, which balances SSR and SPA for optimal UX and DX. The project uses TanStack Start, React 19, oRPC, and other modern technologies.
+
+## Key Concepts
+
+### Shell SPA Pattern
+- **SSR (Server-Side Rendered)**: Authentication, app settings, user preferences, minimal shell UI
+- **SPA (Single Page Application)**: Routing, data fetching, state management, UI rendering
+
+### Core Technologies
+- **TanStack Start**: Full-stack React framework
+- **TanStack Router**: Type-safe routing
+- **TanStack Query**: Server state management
+- **oRPC**: Type-safe RPC for API
+- **Better Auth**: Modern authentication
+- **Drizzle ORM**: Type-safe SQL queries
+- **shadcn/ui**: Accessible component library
+
+## Project Structure
+
+```
+shell-spa/
+├── src/
+│   ├── components/          # Reusable UI components
+│   ├── lib/                 # Core utilities
+│   │   ├── auth/            # Authentication setup
+│   │   ├── db/              # Database configuration
+│   │   └── orpc.ts          # RPC client setup
+│   ├── routes/             # File-based routing
+│   │   ├── (auth)/          # Public auth pages
+│   │   ├── (user)/          # Protected routes
+│   │   ├── (test)/          # Test routes
+│   │   ├── api/             # API endpoints
+│   │   └── __root.tsx       # Shell implementation
+│   └── rpc/                # RPC procedures
+├── public/                 # Static assets
+└── drizzle/                # Database migrations
+```
+
+## Important Files
+
+### Shell Implementation
+- `src/routes/__root.tsx`: Core shell pattern implementation
+- `src/rpc/handlers/app.ts`: Shell data structure definition
+- `src/lib/queries.ts`: Query options for shell data
+
+### Authentication
+- `src/lib/auth/`: Authentication setup and middleware
+- `src/routes/(auth)/`: Login and signup pages
+- `src/routes/(user)/route.tsx`: Protected route handling
+
+### RPC Procedures
+- `src/rpc/`: RPC handlers and router configuration
+- `src/lib/orpc.ts`: RPC client setup
+
+## Development Rules
+
+### Code Style
+- Follow existing code conventions and patterns
+- Use TypeScript for type safety
+- Follow the project's existing naming conventions
+- Use the existing libraries and utilities
+
+### Security
+- Never expose or log secrets and keys
+- Never commit secrets or keys to the repository
+- Follow security best practices
+
+### Testing
+- NO TESTING IF NO MENTIONED TESTING
+- Run lint and typecheck after finish requested task for confirmation
+
+## Common Commands
+
+### Development
+- `pnpm dev`: Start development server
+- `pnpm db generate`: Generate database migrations
+- `pnpm db push`: Push schema to database
+- `pnpm db studio`: Open Drizzle Studio
+
+### Testing
+- `pnpm lint`: Run linting
+- `pnpm typecheck`: Run type checking
+- `pnpm test`: Run tests (if configured)
+
+## Additional Context
+
+### Shell Pattern
+The shell pattern is implemented in `src/routes/__root.tsx` with the following key aspects:
+- Shell data is fetched via RPC and cached with React Query
+- User data is prefetched but not awaited, allowing the client to handle it
+- The shell data structure includes app settings and user information
+
+### Authentication Flow
+1. User request hits the root route
+2. Shell data is SSR'd
+3. User data is prefetched non-blocking
+4. Shell is rendered
+5. Client hydration occurs
+6. SPA takes over
+
+### Protected Routes
+Protected routes are handled in `src/routes/(user)/route.tsx` with:
+- User validation via React Query
+- Redirect to login if user is not authenticated
+- Type-safe user data passed to child routes
+
+## Customization
+
+### Add New Pages
+- **Public Page**: Add to `src/routes/`
+- **Protected Page**: Add to `src/routes/(user)/`
+- **Test Page**: Add to `src/routes/(test)/`
+
+### Add New RPC Procedures
+1. Create procedure in `src/rpc/`
+2. Add to router in `src/rpc/router.ts`
+3. Use in components via `rpcClient`
+
+### Add New UI Components
+```bash
+pnpm ui add component-name
+```
+
+### Form Handling Example
+The demo form at `src/routes/(test)/hello-form.tsx` shows how to:
+- Create a form using `react-hook-form` and shadcn/ui components
+- Use `useMutation` with oRPC for form submission
+- Handle form errors with the `handleFormError` utility
+- Display success messages with Sonner toast notifications
+
+### Database Schema
+Drizzle ORM schemas are defined in `src/lib/db/schema/`:
+- `auth.schema.ts`: Contains user authentication tables (users, sessions, accounts, verification)
+- Tables include proper relationships and indexes for optimal performance
+- Schema exports are centralized in `index.ts` for easy imports
+
+### RPC Handlers
+RPC procedures are organized in `src/rpc/handlers/`:
+- `app.ts`: Shell data and application-level procedures
+- `form.ts`: Form handling procedures with Zod validation
+- `user.ts`: User-related procedures
+- Each handler uses `baseProcedure` for consistent context handling
+- Procedures return type-safe responses for client consumption
+
+### Authentication Procedures
+The RPC system includes authentication middleware for protected procedures:
+- `baseProcedure`: Base procedure with session context
+- `publicProcedure`: Alias for baseProcedure (public access)
+- `authedProcedure`: Protected procedure requiring valid session
+- The `authMiddleware` validates session and extracts user data
+- Use `authedProcedure` for routes requiring authentication
+
+### Data Management
+All server data operations should go through the RPC layer for centralized management:
+- **Data Fetching**: Use RPC procedures for all server data retrieval
+- **Queries**: Implement query logic in RPC handlers
+- **Forms**: Handle form submissions via RPC mutations
+- **Mutations**: Centralize all data modifications in RPC procedures
+- This ensures type safety, consistent error handling, and maintainable code structure
+
+### Environment Configuration
+Type-safe environment variables are configured in `src/env/`:
+- `client.ts`: Client-side environment variables with `VITE_` prefix
+- `server.ts`: Server-side environment variables with Zod validation
+- Both use `@t3-oss/env-core` for type safety and runtime validation
+- Client variables are prefixed with `VITE_` for security
+
+## Performance Optimizations
+
+- **React Query Caching**: 2-minute stale time reduces server calls
+- **Auth Cookie Cache**: 5-minute server-side cache reduces DB queries
+- **Intent-based Preloading**: Faster navigation
+- **React Compiler**: Automatic memoization
+- **SSR-Query Integration**: Optimal data fetching
+
+## Learning Resources
+
+- [TanStack Start Docs](https://tanstack.com/start/latest)
+- [oRPC Documentation](https://orpc.dev/)
+- [Better Auth Docs](https://www.better-auth.com/)
+- [Drizzle ORM Docs](https://orm.drizzle.team/)
