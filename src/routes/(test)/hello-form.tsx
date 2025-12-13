@@ -1,0 +1,82 @@
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { handleFormError } from "@/lib/form-helpers";
+import { orpc } from "@/lib/orpc";
+import { toast } from "sonner";
+
+export const Route = createFileRoute("/(test)/hello-form")({
+  component: RouteComponent,
+});
+
+function RouteComponent() {
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+    },
+  });
+
+  const formHello = useMutation(
+    orpc.form.hello.mutationOptions({
+      onSuccess: (data) => {
+        console.log({ data });
+        toast.success(data.message);
+      },
+      onError: (error) => handleFormError(error, form.setError),
+    }),
+  );
+
+  return (
+    <div>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(async (data) => {
+            await formHello.mutateAsync(data);
+          })}
+          className="space-y-4 max-w-md mx-auto p-6 rounded-lg shadow-md"
+        >
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input placeholder="shadcn" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input placeholder="shadcn@example.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit">
+            {form.formState.isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
+        </form>
+      </Form>
+    </div>
+  );
+}
