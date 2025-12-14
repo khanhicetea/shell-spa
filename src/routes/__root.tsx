@@ -1,20 +1,20 @@
 /// <reference types="vite/client" />
+
+import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import {
   createRootRouteWithContext,
   HeadContent,
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import type React from "react";
 import { ThemeProvider } from "@/components/spa/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import type { RPCClient } from "@/lib/orpc";
-import {
-  type AuthQueryResult,
-  authQueryOptions,
-  shellQueryOptions,
-} from "@/lib/queries";
+import { type AuthQueryResult, authQueryOptions, shellQueryOptions } from "@/lib/queries";
 import appCss from "@/styles.css?url";
 
 export const Route = createRootRouteWithContext<{
@@ -25,9 +25,7 @@ export const Route = createRootRouteWithContext<{
   beforeLoad: async ({ context }) => {
     // Shell Pattern: SSR shell data via RPC with React Query caching
     // This runs on the server and provides minimal data needed for the app shell
-    const shell = await context.queryClient.ensureQueryData(
-      shellQueryOptions(),
-    );
+    const shell = await context.queryClient.ensureQueryData(shellQueryOptions());
 
     // Prefetch user data but don't await it - let client handle it
     // This ensures the shell loads quickly while user data loads in the background
@@ -51,8 +49,7 @@ export const Route = createRootRouteWithContext<{
       },
       {
         name: "description",
-        content:
-          "A minimal shell SPA boilerplate with SSR shell and client-side SPA",
+        content: "A minimal shell SPA boilerplate with SSR shell and client-side SPA",
       },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
@@ -68,18 +65,18 @@ function RootComponent() {
       <Outlet />
       <Toaster richColors />
 
-      {/*<TanStackDevtools
-          plugins={[
-            {
-              name: "TanStack Query",
-              render: <ReactQueryDevtoolsPanel />,
-            },
-            {
-              name: "TanStack Router",
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />*/}
+      <TanStackDevtools
+        plugins={[
+          {
+            name: "TanStack Query",
+            render: <ReactQueryDevtoolsPanel />,
+          },
+          {
+            name: "TanStack Router",
+            render: <TanStackRouterDevtoolsPanel />,
+          },
+        ]}
+      />
     </ThemeProvider>
   );
 }

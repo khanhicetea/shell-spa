@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import {
   type ColumnDef,
@@ -30,12 +30,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -45,10 +40,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import {
   Sheet,
   SheetContent,
@@ -66,6 +58,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import authClient from "@/lib/auth/auth-client";
+import { orpc } from "@/lib/orpc";
 import type { Outputs } from "@/rpc/types";
 
 export type User = Outputs["user"]["listUsers"]["users"][number];
@@ -104,9 +97,7 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "role",
     header: "Role",
-    cell: ({ row }) => (
-      <Badge className="capitalize">{row.getValue("role")}</Badge>
-    ),
+    cell: ({ row }) => <Badge className="capitalize">{row.getValue("role")}</Badge>,
   },
 ];
 
@@ -117,25 +108,30 @@ export const Route = createFileRoute("/admin/users")({
   }),
   loaderDeps: ({ search }) => ({ page: search.page }),
   loader: async ({ deps, context }) => {
-    const data = await context.rpcClient.user.listUsers({ page: deps.page });
-    return data;
+    context.queryClient.prefetchQuery(
+      orpc.user.listUsers.queryOptions({
+        input: { page: deps.page },
+      }),
+    );
+
+    return { page: deps.page };
   },
 });
 
 function UsersPage() {
+  const page = Route.useSearch({ select: (s) => s.page as number });
   const {
-    users,
-    pageCount,
-    pageSize,
-    totalCount,
-    page: currentPage,
-  } = Route.useLoaderData();
+    data: { users, pageCount, pageSize, totalCount },
+  } = useSuspenseQuery(
+    orpc.user.listUsers.queryOptions({
+      input: { page },
+    }),
+  );
   const [rowSelection, setRowSelection] = React.useState({});
   const navigate = Route.useNavigate();
   const router = useRouter();
   const [bannedUser, setBannedUser] = React.useState<User | null>(null);
-  const [changePasswordUser, setChangePasswordUser] =
-    React.useState<User | null>(null);
+  const [changePasswordUser, setChangePasswordUser] = React.useState<User | null>(null);
 
   const actionsColumns: ColumnDef<User>[] = [
     {
@@ -263,26 +259,17 @@ function UsersPage() {
               <TableBody>
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
+                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
                       No results.
                     </TableCell>
                   </TableRow>
@@ -291,7 +278,7 @@ function UsersPage() {
             </Table>
           </div>
           <DataTablePagination
-            currentPage={currentPage}
+            currentPage={page}
             pageCount={pageCount}
             totalCount={totalCount}
             pageSize={pageSize}
@@ -345,17 +332,12 @@ function BanUserForm({
   });
 
   const banMutation = useMutation({
-    mutationFn: async (data: {
-      banReason: string;
-      banExpire: string | undefined;
-    }) => {
+    mutationFn: async (data: { banReason: string; banExpire: string | undefined }) => {
       const res = await authClient.admin.banUser({
         userId: user.id,
         banReason: data.banReason,
         banExpiresIn: data.banExpire
-          ? Math.floor(
-              (new Date(`${data.banExpire}:00`).getTime() - Date.now()) / 1000,
-            )
+          ? Math.floor((new Date(`${data.banExpire}:00`).getTime() - Date.now()) / 1000)
           : undefined,
       });
 
@@ -446,8 +428,7 @@ function ChangePasswordForm({
   });
 
   const generateRandomPassword = () => {
-    const chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let result = "";
     for (let i = 0; i < 12; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -512,11 +493,9 @@ function ChangePasswordForm({
                           type="button"
                           variant="outline"
                           onClick={() => {
-                            navigator.clipboard
-                              .writeText(field.value)
-                              .then(() => {
-                                toast.success("Password copied to clipboard");
-                              });
+                            navigator.clipboard.writeText(field.value).then(() => {
+                              toast.success("Password copied to clipboard");
+                            });
                           }}
                         >
                           <CopyIcon />
@@ -535,10 +514,7 @@ function ChangePasswordForm({
                 )}
               />
               <div>
-                <Button
-                  disabled={changePasswordMutation.isPending}
-                  type="submit"
-                >
+                <Button disabled={changePasswordMutation.isPending} type="submit">
                   Change Password
                 </Button>
               </div>
@@ -647,11 +623,7 @@ function CreateUserForm({
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Enter password"
-                        {...field}
-                      />
+                      <Input type="password" placeholder="Enter password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -664,16 +636,9 @@ function CreateUserForm({
                   <FormItem>
                     <FormLabel>User role</FormLabel>
                     <FormControl>
-                      <NativeSelect
-                        onChange={field.onChange}
-                        value={field.value}
-                      >
-                        <NativeSelectOption value="user">
-                          User
-                        </NativeSelectOption>
-                        <NativeSelectOption value="admin">
-                          Admin
-                        </NativeSelectOption>
+                      <NativeSelect onChange={field.onChange} value={field.value}>
+                        <NativeSelectOption value="user">User</NativeSelectOption>
+                        <NativeSelectOption value="admin">Admin</NativeSelectOption>
                       </NativeSelect>
                     </FormControl>
                     <FormMessage />
