@@ -2,9 +2,9 @@ import { count, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { user as userTable } from "@/lib/db/schema/auth.schema";
-import { authedProcedure } from "../base";
+import { adminProcedure } from "../base";
 
-export const listUsers = authedProcedure
+export const listUsers = adminProcedure
   .input(
     z.object({
       page: z.number().int().positive().catch(1),
@@ -26,13 +26,14 @@ export const listUsers = authedProcedure
 
     return {
       users,
+      page,
       pageSize: limit,
       totalCount: totalCountResult[0]?.count ?? 0,
       pageCount: Math.ceil((totalCountResult[0]?.count ?? 0) / limit),
     };
   });
 
-export const getUserById = authedProcedure
+export const getUserById = adminProcedure
   .input(z.object({ id: z.string() }))
   .handler(async ({ input }) => {
     const foundUser = await db.query.user.findFirst({

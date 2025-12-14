@@ -1,5 +1,5 @@
-import type { AuthSession } from "@/lib/auth/auth";
 import { ORPCError, os } from "@orpc/server";
+import type { AuthSession } from "@/lib/auth/auth";
 
 export const authMiddleware = os
   .$context<{ session: AuthSession }>()
@@ -16,3 +16,13 @@ export const authMiddleware = os
 
     return result;
   });
+
+export const adminMiddleware = authMiddleware.concat(async ({ context, next }) => {
+  if (context.user.role !== "admin") {
+    throw new ORPCError("UNAUTHORIZED");
+  }
+
+  const result = await next();
+
+  return result;
+});

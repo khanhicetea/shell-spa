@@ -110,11 +110,7 @@ export const Route = createFileRoute("/admin/users")({
   loaderDeps: ({ search }) => ({ page: search.page }),
   loader: async ({ deps, context }) => {
     const data = await context.rpcClient.user.listUsers({ page: deps.page });
-
-    return {
-      ...data,
-      page: deps.page,
-    };
+    return data;
   },
 });
 

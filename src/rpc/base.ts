@@ -1,6 +1,6 @@
-import type { AuthSession } from "@/lib/auth/auth";
 import { os } from "@orpc/server";
-import { authMiddleware } from "./middlewares";
+import type { AuthSession } from "@/lib/auth/auth";
+import { adminMiddleware, authMiddleware } from "./middlewares";
 
 export const baseProcedure = os.$context<{
   headers: Headers;
@@ -8,3 +8,4 @@ export const baseProcedure = os.$context<{
 }>();
 export const publicProcedure = baseProcedure;
 export const authedProcedure = baseProcedure.use(authMiddleware);
+export const adminProcedure = baseProcedure.use(adminMiddleware);
