@@ -172,6 +172,46 @@ All server data operations should go through the RPC layer for centralized manag
 - **Mutations**: Centralize all data modifications in RPC procedures
 - This ensures type safety, consistent error handling, and maintainable code structure
 
+### Data Fetching Pattern (in page route)
+- Use `useQuery` for fetching data
+- Use `useMutation` for updating data
+- Prefetch data in Route loader, then use same queryKey in Route component (can leverage orpc key utils)
+- Example
+
+```ts
+export const Route = createFileRoute("/admin/users")({
+  component: UsersPage,
+  validateSearch: z.object({
+    page: z.number().int().positive().catch(1),
+  }),
+  loaderDeps: ({ search }) => ({ page: search.page }),
+  loader: async ({ deps, context }) => {
+    context.queryClient.prefetchQuery(
+      orpc.user.listUsers.queryOptions({
+        input: { page: deps.page },
+      }), // same query options, same key
+    );
+
+    return { app: context.shell.app };
+  },
+});
+
+function UsersPage() {
+  const { app } = Route.useLoaderData(); // sample of use loader data from reading from context
+  const page = Route.useSearch({ select: (s) => s.page as number }); // sample for reading in query params
+  const {
+    data: { users, pageCount, pageSize, totalCount },
+    refetch: refetchUsers, // refetch data on invalidation
+  } = useSuspenseQuery(
+    orpc.user.listUsers.queryOptions({
+      input: { page },
+    }), // same query options, same key
+  );
+
+  // render function below
+}
+```
+
 ### Environment Configuration
 Type-safe environment variables are configured in `src/env/`:
 - `client.ts`: Client-side environment variables with `VITE_` prefix

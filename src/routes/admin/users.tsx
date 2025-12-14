@@ -122,14 +122,14 @@ function UsersPage() {
   const page = Route.useSearch({ select: (s) => s.page as number });
   const {
     data: { users, pageCount, pageSize, totalCount },
+    refetch: refetchUsers,
   } = useSuspenseQuery(
     orpc.user.listUsers.queryOptions({
       input: { page },
     }),
   );
-  const [rowSelection, setRowSelection] = React.useState({});
   const navigate = Route.useNavigate();
-  const router = useRouter();
+  const [rowSelection, setRowSelection] = React.useState({});
   const [bannedUser, setBannedUser] = React.useState<User | null>(null);
   const [changePasswordUser, setChangePasswordUser] = React.useState<User | null>(null);
 
@@ -149,7 +149,7 @@ function UsersPage() {
                     userId: user.id,
                   });
                   if (res.error === null) {
-                    router.invalidate();
+                    refetchUsers();
                     toast.success(`User ${user.email} has been unbanned`);
                   }
                 }}
@@ -231,7 +231,7 @@ function UsersPage() {
               </Button>
             }
             onSuccess={() => {
-              router.invalidate();
+              refetchUsers();
             }}
           />
         </div>
@@ -293,7 +293,7 @@ function UsersPage() {
           user={bannedUser}
           onOpenChange={(v) => v || setBannedUser(null)}
           onSuccess={() => {
-            router.invalidate();
+            refetchUsers();
             toast.success(`User ${bannedUser.email} has been banned !`);
           }}
         />
@@ -304,7 +304,7 @@ function UsersPage() {
           user={changePasswordUser}
           onOpenChange={(v) => v || setChangePasswordUser(null)}
           onSuccess={() => {
-            router.invalidate();
+            refetchUsers();
             toast.success(
               `Password for user ${changePasswordUser.email} has been changed`,
             );
