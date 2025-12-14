@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "node --env-file=.env .output/server/index.mjs",
     "start": "node .output/server/index.mjs",
     "lint": "biome lint --write",
     "format": "biome format --write",

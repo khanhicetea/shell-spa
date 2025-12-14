@@ -80,10 +80,11 @@ shell-spa/
 - `pnpm db generate`: Generate database migrations
 - `pnpm db push`: Push schema to database
 - `pnpm db studio`: Open Drizzle Studio
+- `pnpm ui add [shadcn-component]`: Add Shadcn UI component
 
 ### Testing
 - `pnpm lint`: Run linting
-- `pnpm typecheck`: Run type checking
+- `pnpm check-types`: Run type checking
 - `pnpm test`: Run tests (if configured)
 
 ## Additional Context
@@ -103,22 +104,28 @@ The shell pattern is implemented in `src/routes/__root.tsx` with the following k
 6. SPA takes over
 
 ### Protected Routes
-Protected routes are handled in `src/routes/(user)/route.tsx` with:
+
+Protected routes (user role) are handled in `src/routes/(user)/route.tsx` with:
 - User validation via React Query
 - Redirect to login if user is not authenticated
 - Type-safe user data passed to child routes
+
+Protected admin routes (admin role) are handled in `src/routes/admin/route.tsx` with:
+- Admin validation via React Query
 
 ## Customization
 
 ### Add New Pages
 - **Public Page**: Add to `src/routes/`
+- **Admin Page**: Add to `src/routes/admin/`
 - **Protected Page**: Add to `src/routes/(user)/`
 - **Test Page**: Add to `src/routes/(test)/`
 
 ### Add New RPC Procedures
 1. Create procedure in `src/rpc/`
 2. Add to router in `src/rpc/router.ts`
-3. Use in components via `rpcClient`
+3. Use in route loader, beforeLoad via `context.rpcClient`
+3. Use in component via `useQuery(orpc.[route].[action].queryOptions(...))` and  `useMutation(orpc.[route].[action].mutationOptions(...))`
 
 ### Add New UI Components
 ```bash
@@ -135,6 +142,7 @@ The demo form at `src/routes/(test)/hello-form.tsx` shows how to:
 ### Database Schema
 Drizzle ORM schemas are defined in `src/lib/db/schema/`:
 - `auth.schema.ts`: Contains user authentication tables (users, sessions, accounts, verification)
+- `[feature].schema.ts`: Contains feature-related tables (all tables related to [feature])
 - Tables include proper relationships and indexes for optimal performance
 - Schema exports are centralized in `index.ts` for easy imports
 
@@ -151,8 +159,10 @@ The RPC system includes authentication middleware for protected procedures:
 - `baseProcedure`: Base procedure with session context
 - `publicProcedure`: Alias for baseProcedure (public access)
 - `authedProcedure`: Protected procedure requiring valid session
+- `adminProcedure`: Protected admin procedure requiring valid admin role session
 - The `authMiddleware` validates session and extracts user data
 - Use `authedProcedure` for routes requiring authentication
+- Use `adminProcedure` for routes requiring admin role
 
 ### Data Management
 All server data operations should go through the RPC layer for centralized management:
