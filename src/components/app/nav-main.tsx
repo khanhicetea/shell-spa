@@ -1,5 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { LayoutDashboard, type LucideIcon, SettingsIcon, UsersIcon } from "lucide-react";
+import {
+  HandFist,
+  LayoutDashboard,
+  type LucideIcon,
+  SettingsIcon,
+  UsersIcon,
+} from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -15,13 +21,13 @@ export function NavMain() {
     icon?: LucideIcon;
   }[] = [
     {
-      title: "Users",
-      url: "/app/users",
-      icon: UsersIcon,
+      title: "Hello",
+      url: "/app/hello-form",
+      icon: HandFist,
     },
     {
       title: "Settings",
-      url: "/settings",
+      url: "/app/settings",
       icon: SettingsIcon,
     },
   ];

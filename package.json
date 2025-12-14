@@ -20,6 +20,7 @@
     "auth:generate": "pnpx @better-auth/cli@latest generate --config ./src/lib/auth/auth.ts --y --output ./src/lib/db/schema/auth.schema.ts && prettier --write ./src/lib/db/schema/auth.schema.ts"
   },
   "dependencies": {
+    "@daveyplate/better-auth-ui": "^3.2.13",
     "@hookform/resolvers": "^5.2.2",
     "@orpc/client": "^1.12.3",
     "@orpc/server": "^1.12.3",

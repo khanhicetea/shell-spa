@@ -15,7 +15,7 @@ import { handleFormError } from "@/lib/form-helpers";
 import { orpc } from "@/lib/orpc";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/(test)/hello-form")({
+export const Route = createFileRoute("/(user)/app/hello-form")({
   component: RouteComponent,
 });
 

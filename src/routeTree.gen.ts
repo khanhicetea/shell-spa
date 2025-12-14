@@ -15,13 +15,14 @@ import { Route as authRouteRouteImport } from './routes/(auth)/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
-import { Route as testHelloFormRouteImport } from './routes/(test)/hello-form'
 import { Route as authSignupRouteImport } from './routes/(auth)/signup'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 import { Route as userAppRouteRouteImport } from './routes/(user)/app/route'
 import { Route as userAppIndexRouteImport } from './routes/(user)/app/index'
 import { Route as ApiRpcSplatRouteImport } from './routes/api/rpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as userAppSettingsRouteImport } from './routes/(user)/app/settings'
+import { Route as userAppHelloFormRouteImport } from './routes/(user)/app/hello-form'
 
 const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
@@ -50,11 +51,6 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AdminRouteRoute,
-} as any)
-const testHelloFormRoute = testHelloFormRouteImport.update({
-  id: '/(test)/hello-form',
-  path: '/hello-form',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const authSignupRoute = authSignupRouteImport.update({
   id: '/signup',
@@ -86,6 +82,16 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const userAppSettingsRoute = userAppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => userAppRouteRoute,
+} as any)
+const userAppHelloFormRoute = userAppHelloFormRouteImport.update({
+  id: '/hello-form',
+  path: '/hello-form',
+  getParentRoute: () => userAppRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -93,9 +99,10 @@ export interface FileRoutesByFullPath {
   '/app': typeof userAppRouteRouteWithChildren
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
-  '/hello-form': typeof testHelloFormRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/users': typeof AdminUsersRoute
+  '/app/hello-form': typeof userAppHelloFormRoute
+  '/app/settings': typeof userAppSettingsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/app/': typeof userAppIndexRoute
@@ -105,9 +112,10 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRouteRouteWithChildren
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
-  '/hello-form': typeof testHelloFormRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/users': typeof AdminUsersRoute
+  '/app/hello-form': typeof userAppHelloFormRoute
+  '/app/settings': typeof userAppSettingsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/app': typeof userAppIndexRoute
@@ -121,9 +129,10 @@ export interface FileRoutesById {
   '/(user)/app': typeof userAppRouteRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/signup': typeof authSignupRoute
-  '/(test)/hello-form': typeof testHelloFormRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/users': typeof AdminUsersRoute
+  '/(user)/app/hello-form': typeof userAppHelloFormRoute
+  '/(user)/app/settings': typeof userAppSettingsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/(user)/app/': typeof userAppIndexRoute
@@ -136,9 +145,10 @@ export interface FileRouteTypes {
     | '/app'
     | '/login'
     | '/signup'
-    | '/hello-form'
     | '/admin/dashboard'
     | '/admin/users'
+    | '/app/hello-form'
+    | '/app/settings'
     | '/api/auth/$'
     | '/api/rpc/$'
     | '/app/'
@@ -148,9 +158,10 @@ export interface FileRouteTypes {
     | '/admin'
     | '/login'
     | '/signup'
-    | '/hello-form'
     | '/admin/dashboard'
     | '/admin/users'
+    | '/app/hello-form'
+    | '/app/settings'
     | '/api/auth/$'
     | '/api/rpc/$'
     | '/app'
@@ -163,9 +174,10 @@ export interface FileRouteTypes {
     | '/(user)/app'
     | '/(auth)/login'
     | '/(auth)/signup'
-    | '/(test)/hello-form'
     | '/admin/dashboard'
     | '/admin/users'
+    | '/(user)/app/hello-form'
+    | '/(user)/app/settings'
     | '/api/auth/$'
     | '/api/rpc/$'
     | '/(user)/app/'
@@ -176,7 +188,6 @@ export interface RootRouteChildren {
   authRouteRoute: typeof authRouteRouteWithChildren
   userRouteRoute: typeof userRouteRouteWithChildren
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
-  testHelloFormRoute: typeof testHelloFormRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiRpcSplatRoute: typeof ApiRpcSplatRoute
 }
@@ -225,13 +236,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/(test)/hello-form': {
-      id: '/(test)/hello-form'
-      path: '/hello-form'
-      fullPath: '/hello-form'
-      preLoaderRoute: typeof testHelloFormRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(auth)/signup': {
       id: '/(auth)/signup'
       path: '/signup'
@@ -274,6 +278,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(user)/app/settings': {
+      id: '/(user)/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof userAppSettingsRouteImport
+      parentRoute: typeof userAppRouteRoute
+    }
+    '/(user)/app/hello-form': {
+      id: '/(user)/app/hello-form'
+      path: '/hello-form'
+      fullPath: '/app/hello-form'
+      preLoaderRoute: typeof userAppHelloFormRouteImport
+      parentRoute: typeof userAppRouteRoute
+    }
   }
 }
 
@@ -292,10 +310,14 @@ const authRouteRouteWithChildren = authRouteRoute._addFileChildren(
 )
 
 interface userAppRouteRouteChildren {
+  userAppHelloFormRoute: typeof userAppHelloFormRoute
+  userAppSettingsRoute: typeof userAppSettingsRoute
   userAppIndexRoute: typeof userAppIndexRoute
 }
 
 const userAppRouteRouteChildren: userAppRouteRouteChildren = {
+  userAppHelloFormRoute: userAppHelloFormRoute,
+  userAppSettingsRoute: userAppSettingsRoute,
   userAppIndexRoute: userAppIndexRoute,
 }
 
@@ -334,7 +356,6 @@ const rootRouteChildren: RootRouteChildren = {
   authRouteRoute: authRouteRouteWithChildren,
   userRouteRoute: userRouteRouteWithChildren,
   AdminRouteRoute: AdminRouteRouteWithChildren,
-  testHelloFormRoute: testHelloFormRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiRpcSplatRoute: ApiRpcSplatRoute,
 }
