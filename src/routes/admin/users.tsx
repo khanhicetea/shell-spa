@@ -8,7 +8,18 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { UserWithRole } from "better-auth/plugins";
-import { BanIcon, FlagIcon, PlusCircle, Trash2Icon } from "lucide-react";
+import {
+  BanIcon,
+  CopyIcon,
+  Dice2Icon,
+  EyeIcon,
+  EyeOff,
+  FlagIcon,
+  KeyIcon,
+  LockIcon,
+  PlusCircle,
+  Trash2Icon,
+} from "lucide-react";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -16,6 +27,7 @@ import * as z from "zod";
 import { PageTitle } from "@/components/common/page-title";
 import { DataTablePagination } from "@/components/data-table/pagination";
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
@@ -117,6 +129,7 @@ function UsersPage() {
   const navigate = Route.useNavigate();
   const router = useRouter();
   const [bannedUser, setBannedUser] = React.useState<User | null>(null);
+  const [changePasswordUser, setChangePasswordUser] = React.useState<User | null>(null);
 
   const actionsColumns: ColumnDef<User>[] = [
     {
@@ -130,7 +143,9 @@ function UsersPage() {
                 variant="outline"
                 size="sm"
                 onClick={async () => {
-                  const res = await authClient.admin.unbanUser({ userId: user.id });
+                  const res = await authClient.admin.unbanUser({
+                    userId: user.id,
+                  });
                   if (res.error === null) {
                     router.invalidate();
                     toast.success(`User ${user.email} has been unbanned`);
@@ -152,6 +167,16 @@ function UsersPage() {
                 Ban
               </Button>
             )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setChangePasswordUser(user);
+              }}
+            >
+              <KeyIcon />
+              Password
+            </Button>
             <Button variant="destructive" size="sm">
               <Trash2Icon />
             </Button>
@@ -252,7 +277,20 @@ function UsersPage() {
             router.invalidate();
             toast.success(`User ${bannedUser.email} has been banned !`);
           }}
-        ></BanUserForm>
+        />
+      )}
+      {changePasswordUser && (
+        <ChangePasswordForm
+          key={changePasswordUser.id}
+          user={changePasswordUser}
+          onOpenChange={(v) => v || setChangePasswordUser(null)}
+          onSuccess={() => {
+            router.invalidate();
+            toast.success(
+              `Password for user ${changePasswordUser.email} has been changed`,
+            );
+          }}
+        />
       )}
     </div>
   );
@@ -339,6 +377,120 @@ function BanUserForm({
                   variant="destructive"
                 >
                   Ban User
+                </Button>
+              </div>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ChangePasswordForm({
+  user,
+  onOpenChange,
+  onSuccess,
+}: {
+  user: User;
+  onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
+}) {
+  const [showPassword, setShowPassword] = React.useState(false);
+
+  const form = useForm<{ newPassword: string }>({
+    defaultValues: {
+      newPassword: "",
+    },
+  });
+
+  const generateRandomPassword = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    for (let i = 0; i < 12; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    form.setValue("newPassword", result);
+  };
+
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data: { newPassword: string }) => {
+      const res = await authClient.admin.setUserPassword({
+        newPassword: data.newPassword,
+        userId: user.id,
+      });
+
+      if (res.error) {
+        throw new Error(res.error.message);
+      }
+    },
+    onSuccess: () => {
+      onOpenChange(false);
+      onSuccess();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  return (
+    <Dialog open={true} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Change password for '{user.email}'</DialogTitle>
+        </DialogHeader>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit((data) => changePasswordMutation.mutate(data))}
+          >
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>New Password</FormLabel>
+                    <FormControl>
+                      <ButtonGroup className="w-full">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter new password"
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={generateRandomPassword}
+                        >
+                          <Dice2Icon />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            navigator.clipboard.writeText(field.value).then(() => {
+                              toast.success("Password copied to clipboard");
+                            });
+                          }}
+                        >
+                          <CopyIcon />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <EyeOff /> : <EyeIcon />}
+                        </Button>
+                      </ButtonGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div>
+                <Button disabled={changePasswordMutation.isPending} type="submit">
+                  Change Password
                 </Button>
               </div>
             </div>
