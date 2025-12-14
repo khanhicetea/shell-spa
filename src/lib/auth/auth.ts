@@ -1,10 +1,10 @@
-import { db } from "@/lib/db";
 import { createServerOnlyFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
-import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { admin } from "better-auth/plugins";
+import { tanstackStartCookies } from "better-auth/tanstack-start";
+import { db } from "@/lib/db";
 import { ac, admin as adminRole, user as userRole } from "./permissions";
 
 const getAuthConfig = createServerOnlyFn(() =>
