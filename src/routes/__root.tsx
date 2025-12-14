@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-import { useQueryClient, type QueryClient } from "@tanstack/react-query";
+import { type QueryClient, useQueryClient } from "@tanstack/react-query";
 import {
   createRootRouteWithContext,
   HeadContent,
@@ -7,17 +7,11 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import type React from "react";
-
-import {
-  authQueryOptions,
-  shellQueryOptions,
-  type AuthQueryResult,
-} from "@/lib/queries";
-import appCss from "@/styles.css?url";
-
-import { ThemeProvider } from "@/components/app/theme-provider";
+import { ThemeProvider } from "@/components/spa/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import type { RPCClient } from "@/lib/orpc";
+import { type AuthQueryResult, authQueryOptions, shellQueryOptions } from "@/lib/queries";
+import appCss from "@/styles.css?url";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -27,9 +21,7 @@ export const Route = createRootRouteWithContext<{
   beforeLoad: async ({ context }) => {
     // Shell Pattern: SSR shell data via RPC with React Query caching
     // This runs on the server and provides minimal data needed for the app shell
-    const shell = await context.queryClient.ensureQueryData(
-      shellQueryOptions(),
-    );
+    const shell = await context.queryClient.ensureQueryData(shellQueryOptions());
 
     // Prefetch user data but don't await it - let client handle it
     // This ensures the shell loads quickly while user data loads in the background
@@ -53,8 +45,7 @@ export const Route = createRootRouteWithContext<{
       },
       {
         name: "description",
-        content:
-          "A minimal shell SPA boilerplate with SSR shell and client-side SPA",
+        content: "A minimal shell SPA boilerplate with SSR shell and client-side SPA",
       },
     ],
     links: [{ rel: "stylesheet", href: appCss }],

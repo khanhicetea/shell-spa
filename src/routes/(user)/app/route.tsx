@@ -1,36 +1,28 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { AdminSidebar } from "@/components/admin/admin-sidebar";
+import { AppSidebar } from "@/components/app/app-sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 export const Route = createFileRoute("/(user)/app")({
-  component: DashboardLayout,
+  component: AppLayout,
   loader: async ({ context }) => {
-    return { version: context.shell.app.version };
+    const { app, user } = context.shell;
+
+    return { app, user };
   },
 });
 
-function DashboardLayout() {
-  const { version } = Route.useLoaderData();
+function AppLayout() {
+  const { user } = Route.useLoaderData();
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center gap-10 p-2">
-      <div className="flex flex-col items-center gap-2">
-        <h1 className="text-3xl font-bold sm:text-4xl">Dashboard Layout</h1>
-        <pre className="bg-card text-card-foreground mb-4 rounded-md border p-1 text-xs">
-          routes/(authenticated)/dashboard/route.tsx
-        </pre>
-        <div className="text-foreground/80 mb-4 flex flex-col items-center gap-2 text-sm">
-          This is a protected layout from the authenticated layout route:
-          <pre className="bg-card text-card-foreground rounded-md border p-1 text-xs">
-            routes/(authenticated)/route.tsx
-          </pre>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          <Outlet />
         </div>
-
-        <Button type="button" asChild className="w-fit" size="lg">
-          <Link to="/">Back to home, {version}</Link>
-        </Button>
-      </div>
-
-      <Outlet />
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }

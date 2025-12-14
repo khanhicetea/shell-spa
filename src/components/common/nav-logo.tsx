@@ -1,9 +1,4 @@
-import {
-  ChevronsUpDown,
-  PanelRightClose,
-  PanelRightOpen,
-  RocketIcon,
-} from "lucide-react";
+import { PanelRightClose, PanelRightOpen, RocketIcon } from "lucide-react";
 
 import {
   SidebarMenu,
@@ -11,7 +6,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 export function NavLogo() {
   const { open, toggleSidebar } = useSidebar();

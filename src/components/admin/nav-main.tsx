@@ -1,16 +1,5 @@
-import { Link, useMatch } from "@tanstack/react-router";
-import {
-  ChevronRight,
-  LayoutDashboard,
-  type LucideIcon,
-  SettingsIcon,
-  UsersIcon,
-} from "lucide-react";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Link } from "@tanstack/react-router";
+import { LayoutDashboard, type LucideIcon, SettingsIcon, UsersIcon } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupLabel,

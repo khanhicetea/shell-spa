@@ -1,8 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Suspense } from "react";
-import { SignOutButton } from "@/components/app/sign-out-button";
-import { ThemeToggle } from "@/components/app/theme-toggle";
+import { SignOutButton } from "@/components/spa/sign-out-button";
+import { ThemeToggle } from "@/components/spa/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { authQueryOptions } from "@/lib/queries";
 

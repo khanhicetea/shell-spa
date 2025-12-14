@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SignOutButton } from "@/components/app/sign-out-button";
+import { SignOutButton } from "@/components/spa/sign-out-button";
 
 export const Route = createFileRoute("/(user)/app/")({
   component: DashboardIndex,
