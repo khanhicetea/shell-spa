@@ -10,9 +10,11 @@ import type { UserWithRole } from "better-auth/plugins";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
 import * as React from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 import { DataTablePagination } from "@/components/data-table/pagination";
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import {
   Card,
   CardContent,
@@ -21,6 +23,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -92,30 +103,11 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
   {
-    id: "actions",
-    cell: ({ row }) => {
-      const user = row.original;
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id)}>
-              Copy user ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View user</DropdownMenuItem>
-            <DropdownMenuItem>View user details</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    accessorKey: "banned",
+    header: "Banned",
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("banned") ? "Yes" : "No"}</div>
+    ),
   },
 ];
 
@@ -146,10 +138,54 @@ function UsersPage() {
   const [rowSelection, setRowSelection] = React.useState({});
   const navigate = Route.useNavigate();
   const router = useRouter();
+  const [bannedUser, setBannedUser] = React.useState<User | null>(null);
+
+  const actionsColumns: ColumnDef<User>[] = [
+    {
+      id: "actions",
+      cell: ({ row }) => {
+        const user = row.original;
+        return (
+          <ButtonGroup>
+            {user.banned ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  const res = await authClient.admin.unbanUser({ userId: user.id });
+                  if (res.error === null) {
+                    router.invalidate();
+                    toast.success(`User ${user.email} has been unbanned`);
+                  }
+                }}
+              >
+                Unban
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setBannedUser(user);
+                }}
+              >
+                Ban
+              </Button>
+            )}
+            <Button variant="outline" size="sm">
+              Delete
+            </Button>
+          </ButtonGroup>
+        );
+      },
+    },
+  ];
+
+  const tableColumns = [...columns, ...actionsColumns];
 
   const table = useReactTable({
     data: users || [],
-    columns,
+    columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onRowSelectionChange: setRowSelection,
@@ -173,7 +209,7 @@ function UsersPage() {
                 <span>Add User</span>
               </Button>
             }
-            onSuccess={(user) => {
+            onSuccess={() => {
               router.invalidate();
             }}
           />
@@ -230,7 +266,101 @@ function UsersPage() {
           />
         </CardContent>
       </Card>
+      {bannedUser && (
+        <BanUserForm
+          key={bannedUser.id}
+          user={bannedUser}
+          onOpenChange={(v) => v || setBannedUser(null)}
+          onSuccess={() => {
+            router.invalidate();
+          }}
+        ></BanUserForm>
+      )}
     </div>
+  );
+}
+
+function BanUserForm({
+  user,
+  onOpenChange,
+  onSuccess,
+}: {
+  user: User;
+  onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
+}) {
+  const form = useForm<{ banReason: string; banExpire: string | undefined }>({
+    defaultValues: {
+      banReason: "",
+      banExpire: undefined,
+    },
+  });
+
+  return (
+    <Dialog open={true} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Banning user '{user.email}'</DialogTitle>
+          <DialogContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(async (data) => {
+                  const res = await authClient.admin.banUser({
+                    userId: user.id,
+                    banReason: data.banReason,
+                    banExpiresIn: data.banExpire
+                      ? Math.floor(
+                          (new Date(`${data.banExpire}:00`).getTime() - Date.now()) /
+                            1000,
+                        )
+                      : undefined,
+                  });
+
+                  if (res.error === null) {
+                    onOpenChange(false);
+                    onSuccess();
+                  }
+                })}
+              >
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="banReason"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ban Reason</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter ban reason" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="banExpire"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ban Expiration</FormLabel>
+                        <FormControl>
+                          <Input type="datetime-local" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div>
+                    <Button type="submit" variant="destructive">
+                      Ban User
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -309,7 +439,7 @@ function CreateUserForm({
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter password" {...field} />
+                      <Input type="password" placeholder="Enter password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
