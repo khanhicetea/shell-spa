@@ -196,11 +196,11 @@ function UsersPage() {
 
   return (
     <div className="space-y-4 py-4">
-      <Card className="gap-4">
-        <CardHeader className="flex flex-row justify-between items-center">
+      <div className="space-y-4">
+        <div className="flex flex-row justify-between items-center">
           <div>
-            <CardTitle>Users</CardTitle>
-            <CardDescription>Manage user accounts</CardDescription>
+            <h2 className="text-xl font-semibold">Users</h2>
+            <p className="text-md">Manage user accounts</p>
           </div>
           <CreateUserForm
             trigger={
@@ -213,8 +213,8 @@ function UsersPage() {
               router.invalidate();
             }}
           />
-        </CardHeader>
-        <CardContent className="space-y-4">
+        </div>
+        <div className="space-y-4">
           <div className="overflow-hidden rounded-md border">
             <Table>
               <TableHeader>
@@ -264,8 +264,8 @@ function UsersPage() {
             itemsCount={users.length}
             onPageChange={(page) => navigate({ search: { page } })}
           />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
       {bannedUser && (
         <BanUserForm
           key={bannedUser.id}
