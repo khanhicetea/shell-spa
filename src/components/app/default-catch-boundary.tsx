@@ -17,6 +17,9 @@ export function UnauthorizedError() {
         <EmptyDescription>
           You don't have permission to access this page.
         </EmptyDescription>
+        <Button variant="default" asChild>
+          <Link to="/">Back to Home</Link>
+        </Button>
       </EmptyHeader>
     </Empty>
   );
