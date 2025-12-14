@@ -28,7 +28,7 @@ const getORPCClient = createIsomorphicFn()
           mode: "buffered",
           groups: [
             {
-              condition: (options) => true,
+              condition: (_options) => true,
               context: {},
             },
           ],

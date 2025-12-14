@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <explanation> */
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: SVG icon for logo */
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { GalleryVerticalEnd, LoaderCircle } from "lucide-react";
@@ -18,7 +18,11 @@ function SignupForm() {
   const navigate = useNavigate();
 
   const { mutate: signupMutate, isPending } = useMutation({
-    mutationFn: async (data: { name: string; email: string; password: string }) => {
+    mutationFn: async (data: {
+      name: string;
+      email: string;
+      password: string;
+    }) => {
       await authClient.signUp.email(
         {
           ...data,
@@ -61,12 +65,15 @@ function SignupForm() {
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
-            <a href="#" className="flex flex-col items-center gap-2 font-medium">
+            <Link
+              to="/"
+              className="flex flex-col items-center gap-2 font-medium"
+            >
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <GalleryVerticalEnd className="size-6" />
               </div>
               <span className="sr-only">SHELL SPA</span>
-            </a>
+            </Link>
             <h1 className="text-xl font-bold">Sign up for SHELL SPA</h1>
           </div>
           <div className="flex flex-col gap-5">
@@ -114,7 +121,12 @@ function SignupForm() {
                 required
               />
             </div>
-            <Button type="submit" className="mt-2 w-full" size="lg" disabled={isPending}>
+            <Button
+              type="submit"
+              className="mt-2 w-full"
+              size="lg"
+              disabled={isPending}
+            >
               {isPending && <LoaderCircle className="animate-spin" />}
               {isPending ? "Signing up..." : "Sign up"}
             </Button>

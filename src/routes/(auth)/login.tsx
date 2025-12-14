@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <explanation> */
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: SVG icon for logo */
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GalleryVerticalEnd, LoaderCircle } from "lucide-react";
@@ -53,12 +53,15 @@ function LoginForm() {
       <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
-            <a href="#" className="flex flex-col items-center gap-2 font-medium">
+            <Link
+              to="/"
+              className="flex flex-col items-center gap-2 font-medium"
+            >
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <GalleryVerticalEnd className="size-6" />
               </div>
               <span className="sr-only">Acme Inc.</span>
-            </a>
+            </Link>
             <h1 className="text-xl font-bold">Welcome back to Acme Inc.</h1>
           </div>
           <div className="flex flex-col gap-5">
@@ -84,7 +87,12 @@ function LoginForm() {
                 required
               />
             </div>
-            <Button type="submit" className="mt-2 w-full" size="lg" disabled={isPending}>
+            <Button
+              type="submit"
+              className="mt-2 w-full"
+              size="lg"
+              disabled={isPending}
+            >
               {isPending && <LoaderCircle className="animate-spin" />}
               {isPending ? "Logging in..." : "Login"}
             </Button>

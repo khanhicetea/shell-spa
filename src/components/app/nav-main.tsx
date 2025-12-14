@@ -1,14 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import {
-  HandFist,
-  LayoutDashboard,
-  type LucideIcon,
-  SettingsIcon,
-  UsersIcon,
-} from "lucide-react";
+import { HandFist, type LucideIcon, SettingsIcon } from "lucide-react";
 import {
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
