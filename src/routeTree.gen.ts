@@ -18,8 +18,8 @@ import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as testHelloFormRouteImport } from './routes/(test)/hello-form'
 import { Route as authSignupRouteImport } from './routes/(auth)/signup'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
-import { Route as userDashboardRouteRouteImport } from './routes/(user)/dashboard/route'
-import { Route as userDashboardIndexRouteImport } from './routes/(user)/dashboard/index'
+import { Route as userAppRouteRouteImport } from './routes/(user)/app/route'
+import { Route as userAppIndexRouteImport } from './routes/(user)/app/index'
 import { Route as ApiRpcSplatRouteImport } from './routes/api/rpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -66,15 +66,15 @@ const authLoginRoute = authLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => authRouteRoute,
 } as any)
-const userDashboardRouteRoute = userDashboardRouteRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const userAppRouteRoute = userAppRouteRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => userRouteRoute,
 } as any)
-const userDashboardIndexRoute = userDashboardIndexRouteImport.update({
+const userAppIndexRoute = userAppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => userDashboardRouteRoute,
+  getParentRoute: () => userAppRouteRoute,
 } as any)
 const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
   id: '/api/rpc/$',
@@ -90,7 +90,7 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
-  '/dashboard': typeof userDashboardRouteRouteWithChildren
+  '/app': typeof userAppRouteRouteWithChildren
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
   '/hello-form': typeof testHelloFormRoute
@@ -98,7 +98,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
-  '/dashboard/': typeof userDashboardIndexRoute
+  '/app/': typeof userAppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,7 +110,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
-  '/dashboard': typeof userDashboardIndexRoute
+  '/app': typeof userAppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -118,7 +118,7 @@ export interface FileRoutesById {
   '/(auth)': typeof authRouteRouteWithChildren
   '/(user)': typeof userRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
-  '/(user)/dashboard': typeof userDashboardRouteRouteWithChildren
+  '/(user)/app': typeof userAppRouteRouteWithChildren
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/signup': typeof authSignupRoute
   '/(test)/hello-form': typeof testHelloFormRoute
@@ -126,14 +126,14 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
-  '/(user)/dashboard/': typeof userDashboardIndexRoute
+  '/(user)/app/': typeof userAppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/admin'
-    | '/dashboard'
+    | '/app'
     | '/login'
     | '/signup'
     | '/hello-form'
@@ -141,7 +141,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/api/auth/$'
     | '/api/rpc/$'
-    | '/dashboard/'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -153,14 +153,14 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/api/auth/$'
     | '/api/rpc/$'
-    | '/dashboard'
+    | '/app'
   id:
     | '__root__'
     | '/'
     | '/(auth)'
     | '/(user)'
     | '/admin'
-    | '/(user)/dashboard'
+    | '/(user)/app'
     | '/(auth)/login'
     | '/(auth)/signup'
     | '/(test)/hello-form'
@@ -168,7 +168,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/api/auth/$'
     | '/api/rpc/$'
-    | '/(user)/dashboard/'
+    | '/(user)/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -246,19 +246,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authLoginRouteImport
       parentRoute: typeof authRouteRoute
     }
-    '/(user)/dashboard': {
-      id: '/(user)/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof userDashboardRouteRouteImport
+    '/(user)/app': {
+      id: '/(user)/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof userAppRouteRouteImport
       parentRoute: typeof userRouteRoute
     }
-    '/(user)/dashboard/': {
-      id: '/(user)/dashboard/'
+    '/(user)/app/': {
+      id: '/(user)/app/'
       path: '/'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof userDashboardIndexRouteImport
-      parentRoute: typeof userDashboardRouteRoute
+      fullPath: '/app/'
+      preLoaderRoute: typeof userAppIndexRouteImport
+      parentRoute: typeof userAppRouteRoute
     }
     '/api/rpc/$': {
       id: '/api/rpc/$'
@@ -291,23 +291,24 @@ const authRouteRouteWithChildren = authRouteRoute._addFileChildren(
   authRouteRouteChildren,
 )
 
-interface userDashboardRouteRouteChildren {
-  userDashboardIndexRoute: typeof userDashboardIndexRoute
+interface userAppRouteRouteChildren {
+  userAppIndexRoute: typeof userAppIndexRoute
 }
 
-const userDashboardRouteRouteChildren: userDashboardRouteRouteChildren = {
-  userDashboardIndexRoute: userDashboardIndexRoute,
+const userAppRouteRouteChildren: userAppRouteRouteChildren = {
+  userAppIndexRoute: userAppIndexRoute,
 }
 
-const userDashboardRouteRouteWithChildren =
-  userDashboardRouteRoute._addFileChildren(userDashboardRouteRouteChildren)
+const userAppRouteRouteWithChildren = userAppRouteRoute._addFileChildren(
+  userAppRouteRouteChildren,
+)
 
 interface userRouteRouteChildren {
-  userDashboardRouteRoute: typeof userDashboardRouteRouteWithChildren
+  userAppRouteRoute: typeof userAppRouteRouteWithChildren
 }
 
 const userRouteRouteChildren: userRouteRouteChildren = {
-  userDashboardRouteRoute: userDashboardRouteRouteWithChildren,
+  userAppRouteRoute: userAppRouteRouteWithChildren,
 }
 
 const userRouteRouteWithChildren = userRouteRoute._addFileChildren(

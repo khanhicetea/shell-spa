@@ -1,12 +1,11 @@
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import authClient from "@/lib/auth/auth-client";
-import { authQueryOptions } from "@/lib/queries";
-import { useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
 
 export function SignOutButton() {
   const queryClient = useQueryClient();
-  const router = useRouter();
+  const navigate = useNavigate();
   return (
     <Button
       onClick={async () => {
@@ -15,7 +14,7 @@ export function SignOutButton() {
             onResponse: async () => {
               // manually set to null to avoid unnecessary refetching
               queryClient.clear();
-              await router.invalidate();
+              navigate({ to: "/login" });
             },
           },
         });

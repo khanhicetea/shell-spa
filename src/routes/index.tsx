@@ -1,10 +1,10 @@
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Suspense } from "react";
 import { SignOutButton } from "@/components/app/sign-out-button";
 import { ThemeToggle } from "@/components/app/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { authQueryOptions } from "@/lib/queries";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Suspense } from "react";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -14,9 +14,7 @@ function HomePage() {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-8 p-4">
       <div className="flex flex-col items-center gap-4 text-center">
-        <h1 className="text-3xl font-bold sm:text-4xl">
-          Shell SPA Boilerplate
-        </h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">Shell SPA Boilerplate</h1>
         <p className="text-muted-foreground max-w-md">
           A minimal starter with SSR shell for auth and SPA for everything else
         </p>
@@ -43,7 +41,7 @@ function UserAction() {
     <div className="flex flex-col items-center gap-4">
       <p className="text-lg">Welcome back, {user.name}!</p>
       <Button type="button" asChild className="w-fit" size="lg">
-        <Link to="/dashboard">Go to Dashboard</Link>
+        <Link to="/app">Go to App Home</Link>
       </Button>
       <SignOutButton />
     </div>

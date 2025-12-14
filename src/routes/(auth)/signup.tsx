@@ -1,13 +1,12 @@
+import { useMutation } from "@tanstack/react-query";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { GalleryVerticalEnd, LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
 import { SignInSocialButton } from "@/components/app/sign-in-social-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import authClient from "@/lib/auth/auth-client";
-import { authQueryOptions } from "@/lib/queries";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { GalleryVerticalEnd, LoaderCircle } from "lucide-react";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/(auth)/signup")({
   component: SignupForm,

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/(user)/dashboard")({
+export const Route = createFileRoute("/(user)/app")({
   component: DashboardLayout,
   loader: async ({ context }) => {
     return { version: context.shell.app.version };
