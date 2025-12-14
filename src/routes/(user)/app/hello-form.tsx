@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,7 +14,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { handleFormError } from "@/lib/form-helpers";
 import { orpc } from "@/lib/orpc";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/(user)/app/hello-form")({
   component: RouteComponent,
@@ -30,7 +30,6 @@ function RouteComponent() {
   const formHello = useMutation(
     orpc.form.hello.mutationOptions({
       onSuccess: (data) => {
-        console.log({ data });
         toast.success(data.message);
       },
       onError: (error) => handleFormError(error, form.setError),

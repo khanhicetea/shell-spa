@@ -356,7 +356,11 @@ function BanUserForm({
           <DialogTitle>Banning user '{user.email}'</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit((data) => banMutation.mutate(data))}>
+          <form
+            onSubmit={form.handleSubmit(async (data) => {
+              await banMutation.mutateAsync(data);
+            })}
+          >
             <div className="space-y-4">
               <FormField
                 control={form.control}
@@ -455,7 +459,9 @@ function ChangePasswordForm({
         </DialogHeader>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit((data) => changePasswordMutation.mutate(data))}
+            onSubmit={form.handleSubmit(async (data) => {
+              await changePasswordMutation.mutateAsync(data);
+            })}
           >
             <div className="space-y-4">
               <FormField
@@ -570,7 +576,11 @@ function CreateUserForm({
       <SheetTrigger asChild>{trigger}</SheetTrigger>
       <SheetContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit((data) => createUserMutation.mutate(data))}>
+          <form
+            onSubmit={form.handleSubmit(async (data) => {
+              await createUserMutation.mutateAsync(data);
+            })}
+          >
             <SheetHeader>
               <SheetTitle>Create new user</SheetTitle>
             </SheetHeader>
