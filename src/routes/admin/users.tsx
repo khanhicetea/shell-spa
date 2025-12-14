@@ -138,19 +138,25 @@ function UsersPage() {
       id: "actions",
       cell: ({ row }) => {
         const user = row.original;
+        const [isPendingUnban, setIsPendingUnban] = React.useState(false);
+
         return (
           <div className="flex flex-row space-x-2 justify-end">
             {user.banned ? (
               <Button
                 variant="outline"
                 size="sm"
+                disabled={isPendingUnban}
                 onClick={async () => {
+                  setIsPendingUnban(true);
                   const res = await authClient.admin.unbanUser({
                     userId: user.id,
                   });
                   if (res.error === null) {
                     refetchUsers();
                     toast.success(`User ${user.email} has been unbanned`);
+                  } else {
+                    setIsPendingUnban(false);
                   }
                 }}
               >
