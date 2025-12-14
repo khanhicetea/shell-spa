@@ -11,11 +11,7 @@ function DashboardIndex() {
   return (
     <div className="flex flex-col items-center gap-4 p-6">
       <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p className="text-muted-foreground">Welcome to your dashboard</p>
-
-      <Link to="/admin/users" search={{ page: 1 }}>
-        Manage Users
-      </Link>
+      <p className="text-muted-foreground">Welcome to your app</p>
 
       <div className="mt-4 text-center text-sm">
         <p className="font-medium">User Information:</p>

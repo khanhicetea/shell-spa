@@ -183,7 +183,7 @@ function UsersPage() {
                 });
 
                 if (res.error === null) {
-                  return navigate({ to: "/", reloadDocument: true });
+                  return navigate({ to: "/app", reloadDocument: true });
                 }
 
                 toast.error(res.error.message);
