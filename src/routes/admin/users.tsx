@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import {
   type ColumnDef,
@@ -7,39 +8,15 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { UserWithRole } from "better-auth/plugins";
-import { MoreHorizontal, PlusCircle, Trash2Icon } from "lucide-react";
+import { PlusCircle, Trash2Icon } from "lucide-react";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { DataTablePagination } from "@/components/data-table/pagination";
 import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -296,6 +273,29 @@ function BanUserForm({
     },
   });
 
+  const banMutation = useMutation({
+    mutationFn: async (data: { banReason: string; banExpire: string | undefined }) => {
+      const res = await authClient.admin.banUser({
+        userId: user.id,
+        banReason: data.banReason,
+        banExpiresIn: data.banExpire
+          ? Math.floor((new Date(`${data.banExpire}:00`).getTime() - Date.now()) / 1000)
+          : undefined,
+      });
+
+      if (res.error) {
+        throw new Error(res.error.message);
+      }
+    },
+    onSuccess: () => {
+      onOpenChange(false);
+      onSuccess();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   return (
     <Dialog open={true} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -303,24 +303,7 @@ function BanUserForm({
           <DialogTitle>Banning user '{user.email}'</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(async (data) => {
-              const res = await authClient.admin.banUser({
-                userId: user.id,
-                banReason: data.banReason,
-                banExpiresIn: data.banExpire
-                  ? Math.floor(
-                      (new Date(`${data.banExpire}:00`).getTime() - Date.now()) / 1000,
-                    )
-                  : undefined,
-              });
-
-              if (res.error === null) {
-                onOpenChange(false);
-                onSuccess();
-              }
-            })}
-          >
+          <form onSubmit={form.handleSubmit((data) => banMutation.mutate(data))}>
             <div className="space-y-4">
               <FormField
                 control={form.control}
@@ -349,7 +332,11 @@ function BanUserForm({
                 )}
               />
               <div>
-                <Button type="submit" variant="destructive">
+                <Button
+                  disabled={banMutation.isPending}
+                  type="submit"
+                  variant="destructive"
+                >
                   Ban User
                 </Button>
               </div>
@@ -361,6 +348,13 @@ function BanUserForm({
   );
 }
 
+type CreateUser = {
+  email: string;
+  password: string;
+  name: string;
+  role: "user" | "admin";
+};
+
 function CreateUserForm({
   trigger,
   onSuccess,
@@ -370,7 +364,7 @@ function CreateUserForm({
 }) {
   const [open, setOpen] = React.useState(false);
 
-  const form = useForm({
+  const form = useForm<CreateUser>({
     defaultValues: {
       email: "",
       password: "",
@@ -379,26 +373,36 @@ function CreateUserForm({
     },
   });
 
+  const createUserMutation = useMutation({
+    mutationFn: async (data: CreateUser) => {
+      const res = await authClient.admin.createUser({
+        email: data.email,
+        password: data.password,
+        name: data.name,
+        role: data.role as "user" | "admin",
+      });
+
+      if (res.error) {
+        throw new Error(res.error.message);
+      }
+
+      return res.data;
+    },
+    onSuccess: (data) => {
+      setOpen(false);
+      onSuccess(data.user);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
       <SheetContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(async (data) => {
-              const res = await authClient.admin.createUser({
-                email: data.email,
-                password: data.password,
-                name: data.name,
-                role: data.role as "user" | "admin",
-              });
-
-              if (res.error === null) {
-                setOpen(false);
-                onSuccess(res.data.user);
-              }
-            })}
-          >
+          <form onSubmit={form.handleSubmit((data) => createUserMutation.mutate(data))}>
             <SheetHeader>
               <SheetTitle>Create new user</SheetTitle>
             </SheetHeader>
@@ -460,8 +464,8 @@ function CreateUserForm({
               />
             </div>
             <SheetFooter className="flex flex-row justify-end">
-              <Button type="submit">
-                {form.formState.isSubmitting ? "Saving ..." : "Save"}
+              <Button disabled={createUserMutation.isPending} type="submit">
+                {createUserMutation.isPending ? "Saving ..." : "Save"}
               </Button>
             </SheetFooter>
           </form>

@@ -1,5 +1,5 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { SignOutButton } from "@/components/app/sign-out-button";
-import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(user)/dashboard/")({
   component: DashboardIndex,
@@ -12,6 +12,10 @@ function DashboardIndex() {
     <div className="flex flex-col items-center gap-4 p-6">
       <h1 className="text-2xl font-bold">Dashboard</h1>
       <p className="text-muted-foreground">Welcome to your dashboard</p>
+
+      <Link to="/admin/users" search={{ page: 1 }}>
+        Manage Users
+      </Link>
 
       <div className="mt-4 text-center text-sm">
         <p className="font-medium">User Information:</p>

@@ -1,13 +1,17 @@
 import { createServerOnlyFn } from "@tanstack/react-start";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-
+import { env } from "@/env/server";
 import * as schema from "@/lib/db/schema";
 import { registerQueryTimeLogging } from "./debug";
 
 const getDatabase = createServerOnlyFn(() => {
+  console.log({
+    connectionString: env.DATABASE_URL,
+    max: parseInt(process.env.DATABASE_MAX_CONNECTIONS || "2", 10),
+  });
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: env.DATABASE_URL,
     max: parseInt(process.env.DATABASE_MAX_CONNECTIONS || "2", 10),
   });
 
