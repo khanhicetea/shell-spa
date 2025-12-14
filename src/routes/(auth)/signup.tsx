@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/a11y/noSvgWithoutTitle: <explanation> */
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { GalleryVerticalEnd, LoaderCircle } from "lucide-react";
@@ -64,9 +65,9 @@ function SignupForm() {
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <GalleryVerticalEnd className="size-6" />
               </div>
-              <span className="sr-only">Acme Inc.</span>
+              <span className="sr-only">SHELL SPA</span>
             </a>
-            <h1 className="text-xl font-bold">Sign up for Acme Inc.</h1>
+            <h1 className="text-xl font-bold">Sign up for SHELL SPA</h1>
           </div>
           <div className="flex flex-col gap-5">
             <div className="grid gap-2">
