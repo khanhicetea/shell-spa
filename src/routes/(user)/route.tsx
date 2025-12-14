@@ -1,5 +1,5 @@
-import { authQueryOptions } from "@/lib/queries";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { authQueryOptions } from "@/lib/queries";
 
 export const Route = createFileRoute("/(user)")({
   component: Outlet,

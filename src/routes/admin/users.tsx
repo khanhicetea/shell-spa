@@ -8,11 +8,12 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { UserWithRole } from "better-auth/plugins";
-import { PlusCircle, Trash2Icon } from "lucide-react";
+import { BanIcon, FlagIcon, PlusCircle, Trash2Icon } from "lucide-react";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
+import { PageTitle } from "@/components/common/page-title";
 import { DataTablePagination } from "@/components/data-table/pagination";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -136,6 +137,7 @@ function UsersPage() {
                   }
                 }}
               >
+                <FlagIcon />
                 Unban
               </Button>
             ) : (
@@ -146,6 +148,7 @@ function UsersPage() {
                   setBannedUser(user);
                 }}
               >
+                <BanIcon />
                 Ban
               </Button>
             )}
@@ -175,14 +178,11 @@ function UsersPage() {
     <div className="space-y-4 py-4">
       <div className="space-y-4">
         <div className="flex flex-row justify-between items-center">
-          <div>
-            <h2 className="text-xl font-semibold">Users</h2>
-            <p className="text-md">Manage user accounts</p>
-          </div>
+          <PageTitle title="Users" description="Manage user accounts" />
           <CreateUserForm
             trigger={
-              <Button size="sm" className="gap-1">
-                <PlusCircle className="h-4 w-4" />
+              <Button>
+                <PlusCircle className="size-4" />
                 <span>Add User</span>
               </Button>
             }
@@ -250,6 +250,7 @@ function UsersPage() {
           onOpenChange={(v) => v || setBannedUser(null)}
           onSuccess={() => {
             router.invalidate();
+            toast.success(`User ${bannedUser.email} has been banned !`);
           }}
         ></BanUserForm>
       )}
@@ -390,6 +391,7 @@ function CreateUserForm({
     },
     onSuccess: (data) => {
       setOpen(false);
+      form.reset();
       onSuccess(data.user);
     },
     onError: (error) => {

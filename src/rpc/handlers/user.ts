@@ -1,4 +1,4 @@
-import { count, eq } from "drizzle-orm";
+import { count, desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { user as userTable } from "@/lib/db/schema/auth.schema";
@@ -19,6 +19,7 @@ export const listUsers = authedProcedure
       db.query.user.findMany({
         limit,
         offset,
+        orderBy: [desc(userTable.createdAt)],
       }),
       db.select({ count: count() }).from(userTable),
     ]);

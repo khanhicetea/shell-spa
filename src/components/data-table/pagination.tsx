@@ -24,7 +24,7 @@ export function DataTablePagination({
     <div className="flex items-center justify-between">
       <div className="text-muted-foreground text-sm">
         Showing {itemsCount === 0 ? 0 : (currentPage - 1) * pageSize + 1} to{" "}
-        {Math.min(currentPage * pageSize, totalCount)} of {totalCount} results
+        {Math.min(currentPage * pageSize, totalCount)} ({totalCount} rows)
       </div>
 
       <div className="flex items-center gap-2">
