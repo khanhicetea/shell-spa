@@ -19,6 +19,8 @@ import {
   LockIcon,
   PlusCircle,
   Trash2Icon,
+  UserSearch,
+  UserSearchIcon,
 } from "lucide-react";
 import * as React from "react";
 import { useForm } from "react-hook-form";
@@ -137,7 +139,7 @@ function UsersPage() {
       cell: ({ row }) => {
         const user = row.original;
         return (
-          <div className="flex flex-row space-x-4 justify-end">
+          <div className="flex flex-row space-x-2 justify-end">
             {user.banned ? (
               <Button
                 variant="outline"
@@ -176,6 +178,23 @@ function UsersPage() {
             >
               <KeyIcon />
               Password
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                const res = await authClient.admin.impersonateUser({
+                  userId: user.id,
+                });
+
+                if (res.error === null) {
+                  return navigate({ to: "/", reloadDocument: true });
+                }
+
+                toast.error(res.error.message);
+              }}
+            >
+              <UserSearchIcon />
             </Button>
             <Button variant="destructive" size="sm">
               <Trash2Icon />
