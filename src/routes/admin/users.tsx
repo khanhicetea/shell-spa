@@ -7,7 +7,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { UserWithRole } from "better-auth/plugins";
-import { MoreHorizontal, PlusCircle } from "lucide-react";
+import { MoreHorizontal, PlusCircle, Trash2Icon } from "lucide-react";
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -146,7 +146,7 @@ function UsersPage() {
       cell: ({ row }) => {
         const user = row.original;
         return (
-          <ButtonGroup>
+          <div className="flex flex-row space-x-4 justify-end">
             {user.banned ? (
               <Button
                 variant="outline"
@@ -172,10 +172,10 @@ function UsersPage() {
                 Ban
               </Button>
             )}
-            <Button variant="outline" size="sm">
-              Delete
+            <Button variant="destructive" size="sm">
+              <Trash2Icon />
             </Button>
-          </ButtonGroup>
+          </div>
         );
       },
     },
@@ -301,64 +301,61 @@ function BanUserForm({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Banning user '{user.email}'</DialogTitle>
-          <DialogContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(async (data) => {
-                  const res = await authClient.admin.banUser({
-                    userId: user.id,
-                    banReason: data.banReason,
-                    banExpiresIn: data.banExpire
-                      ? Math.floor(
-                          (new Date(`${data.banExpire}:00`).getTime() - Date.now()) /
-                            1000,
-                        )
-                      : undefined,
-                  });
-
-                  if (res.error === null) {
-                    onOpenChange(false);
-                    onSuccess();
-                  }
-                })}
-              >
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="banReason"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Ban Reason</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter ban reason" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="banExpire"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Ban Expiration</FormLabel>
-                        <FormControl>
-                          <Input type="datetime-local" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div>
-                    <Button type="submit" variant="destructive">
-                      Ban User
-                    </Button>
-                  </div>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
         </DialogHeader>
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(async (data) => {
+              const res = await authClient.admin.banUser({
+                userId: user.id,
+                banReason: data.banReason,
+                banExpiresIn: data.banExpire
+                  ? Math.floor(
+                      (new Date(`${data.banExpire}:00`).getTime() - Date.now()) / 1000,
+                    )
+                  : undefined,
+              });
+
+              if (res.error === null) {
+                onOpenChange(false);
+                onSuccess();
+              }
+            })}
+          >
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="banReason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ban Reason</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter ban reason" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="banExpire"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Ban Expiration</FormLabel>
+                    <FormControl>
+                      <Input type="datetime-local" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div>
+                <Button type="submit" variant="destructive">
+                  Ban User
+                </Button>
+              </div>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
