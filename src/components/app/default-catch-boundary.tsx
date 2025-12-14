@@ -7,6 +7,20 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 import { Button } from "../ui/button";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "../ui/empty";
+
+export function UnauthorizedError() {
+  return (
+    <Empty>
+      <EmptyHeader>
+        <EmptyTitle>403 - Forbidden</EmptyTitle>
+        <EmptyDescription>
+          You don't have permission to access this page.
+        </EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  );
+}
 
 export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
   const router = useRouter();
@@ -15,7 +29,9 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
     select: (state) => state.id === rootRouteId,
   });
 
-  console.error(error);
+  if ("message" in error && error.message.includes("Unauthorized")) {
+    return <UnauthorizedError />;
+  }
 
   return (
     <div className="flex min-w-0 flex-1 flex-col items-center justify-center gap-6 p-4">
