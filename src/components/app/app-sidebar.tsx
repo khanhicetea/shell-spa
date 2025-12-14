@@ -23,7 +23,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <div className="flex items-center justify-center space-x-2">
           <NavUser />
-          <ThemeToggle />
+          <ThemeToggle className="group-data-[state=collapsed]:hidden" />
         </div>
       </SidebarFooter>
       <SidebarRail />
