@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 import { PageTitle } from "@/components/common/page-title";
 import { DataTablePagination } from "@/components/data-table/pagination";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -95,11 +96,9 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
   {
-    accessorKey: "banned",
-    header: "Banned",
-    cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("banned") ? "Yes" : "No"}</div>
-    ),
+    accessorKey: "role",
+    header: "Role",
+    cell: ({ row }) => <Badge className="capitalize">{row.getValue("role")}</Badge>,
   },
 ];
 

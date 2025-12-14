@@ -14,6 +14,7 @@ import { Route as userRouteRouteImport } from './routes/(user)/route'
 import { Route as authRouteRouteImport } from './routes/(auth)/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as testHelloFormRouteImport } from './routes/(test)/hello-form'
 import { Route as authSignupRouteImport } from './routes/(auth)/signup'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
@@ -43,6 +44,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const testHelloFormRoute = testHelloFormRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
   '/hello-form': typeof testHelloFormRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/login': typeof authLoginRoute
   '/signup': typeof authSignupRoute
   '/hello-form': typeof testHelloFormRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
@@ -114,6 +122,7 @@ export interface FileRoutesById {
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/signup': typeof authSignupRoute
   '/(test)/hello-form': typeof testHelloFormRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/users': typeof AdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/hello-form'
+    | '/admin/dashboard'
     | '/admin/users'
     | '/api/auth/$'
     | '/api/rpc/$'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/hello-form'
+    | '/admin/dashboard'
     | '/admin/users'
     | '/api/auth/$'
     | '/api/rpc/$'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/(auth)/login'
     | '/(auth)/signup'
     | '/(test)/hello-form'
+    | '/admin/dashboard'
     | '/admin/users'
     | '/api/auth/$'
     | '/api/rpc/$'
@@ -204,6 +216,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/(test)/hello-form': {
@@ -296,10 +315,12 @@ const userRouteRouteWithChildren = userRouteRoute._addFileChildren(
 )
 
 interface AdminRouteRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRoute
   AdminUsersRoute: typeof AdminUsersRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminDashboardRoute: AdminDashboardRoute,
   AdminUsersRoute: AdminUsersRoute,
 }
 
