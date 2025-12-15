@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import authClient from "@/lib/auth/auth-client";
 import { authQueryOptions } from "@/lib/queries";
+import { ShellProgressBar } from "@/components/spa/shell-progress-bar";
 
 export const Route = createFileRoute("/(user)")({
   component: UserLayout,
@@ -39,6 +40,7 @@ function UserLayout() {
       Link={NavLink}
     >
       <Outlet />
+      <ShellProgressBar />
     </AuthUIProvider>
   );
 }

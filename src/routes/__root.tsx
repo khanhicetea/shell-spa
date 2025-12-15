@@ -16,6 +16,7 @@ import { Toaster } from "@/components/ui/sonner";
 import type { RPCClient } from "@/lib/orpc";
 import { type AuthQueryResult, authQueryOptions, shellQueryOptions } from "@/lib/queries";
 import appCss from "@/styles.css?url";
+import { ProgressProvider } from "@bprogress/react";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -62,7 +63,14 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   return (
     <ThemeProvider>
-      <Outlet />
+      <ProgressProvider
+        color="gray"
+        delay={125}
+        startPosition={0.25}
+        options={{ showSpinner: false }}
+      >
+        <Outlet />
+      </ProgressProvider>
       <Toaster richColors />
 
       <TanStackDevtools
