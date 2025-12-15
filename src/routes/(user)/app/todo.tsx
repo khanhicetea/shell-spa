@@ -8,7 +8,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Trash2, GripVertical } from "lucide-react";
 import {
   DndContext,
-  DragOverlay,
   useDraggable,
   useDroppable,
   MouseSensor,
@@ -23,14 +22,19 @@ export const Route = createFileRoute("/(user)/app/todo")({
 });
 
 function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: todo.id,
-    });
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: todo.id,
+  });
+
+  const [isEditingContent, setIsEditingContent] = useState(false);
+  const [editingContent, setEditingContent] = useState(todo.content);
 
   const updateMutation = useMutation(
     orpc.todo.updateTodo.mutationOptions({
-      onSuccess: () => onRefetch(),
+      onSuccess: () => {
+        onRefetch();
+        setIsEditingContent(false);
+      },
     }),
   );
 
@@ -45,6 +49,14 @@ function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
       id: todo.id,
       completedAt: todo.completedAt ? null : new Date(),
     });
+  };
+
+  const handleSaveContent = () => {
+    if (editingContent.trim() && editingContent !== todo.content) {
+      updateMutation.mutate({ id: todo.id, content: editingContent.trim() });
+    } else {
+      setIsEditingContent(false);
+    }
   };
 
   const handleDelete = () => {
@@ -74,13 +86,29 @@ function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
             className="h-4 w-4"
           />
           <div className="flex-1 min-w-0">
-            <p
-              className={`text-sm leading-tight break-words ${
-                todo.completedAt ? "line-through text-muted-foreground" : ""
-              }`}
-            >
-              {todo.content}
-            </p>
+            {isEditingContent ? (
+              <textarea
+                value={editingContent}
+                onChange={(e) => setEditingContent(e.target.value)}
+                onBlur={handleSaveContent}
+                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSaveContent()}
+                className="w-full text-sm leading-tight break-words resize-none border-none p-0 focus:ring-0 bg-transparent"
+                rows={Math.max(1, editingContent.split("\n").length)}
+                autoFocus
+              />
+            ) : (
+              <p
+                className={`text-sm leading-tight break-words cursor-pointer hover:bg-muted/50 px-1 rounded ${
+                  todo.completedAt ? "line-through text-muted-foreground" : ""
+                }`}
+                onClick={() => {
+                  setIsEditingContent(true);
+                  setEditingContent(todo.content);
+                }}
+              >
+                {todo.content}
+              </p>
+            )}
           </div>
         </div>
         <Button
@@ -138,12 +166,35 @@ function CategoryColumn({
     }),
   );
 
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editingName, setEditingName] = useState(category.name);
+
+  const updateCategoryMutation = useMutation(
+    orpc.category.updateCategory.mutationOptions({
+      onSuccess: () => {
+        onRefetch();
+        setIsEditingName(false);
+      },
+    }),
+  );
+
   const handleAddTodo = () => {
     if (newTodoContent.trim()) {
       createMutation.mutate({
         content: newTodoContent.trim(),
         categoryId: category.id,
       });
+    }
+  };
+
+  const handleSaveName = () => {
+    if (editingName.trim() && editingName !== category.name) {
+      updateCategoryMutation.mutate({
+        id: category.id,
+        name: editingName.trim(),
+      });
+    } else {
+      setIsEditingName(false);
     }
   };
 
@@ -162,7 +213,26 @@ function CategoryColumn({
         }`}
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-sm">{category.name}</h3>
+          {isEditingName ? (
+            <Input
+              value={editingName}
+              onChange={(e) => setEditingName(e.target.value)}
+              onBlur={handleSaveName}
+              onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
+              className="h-6 text-sm font-semibold border-none p-0 focus:ring-0"
+              autoFocus
+            />
+          ) : (
+            <span
+              className="font-semibold text-sm cursor-pointer hover:bg-muted/50 px-1 rounded"
+              onClick={() => {
+                setIsEditingName(true);
+                setEditingName(category.name);
+              }}
+            >
+              {category.name}
+            </span>
+          )}
           {todos.length === 0 && (
             <Button
               variant="ghost"
@@ -198,11 +268,7 @@ function CategoryColumn({
               >
                 Add
               </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setIsAdding(false)}
-              >
+              <Button size="sm" variant="ghost" onClick={() => setIsAdding(false)}>
                 Cancel
               </Button>
             </div>
@@ -257,11 +323,7 @@ function AddCategoryColumn({
               <Button size="sm" onClick={handleAdd} disabled={isPending}>
                 Add
               </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setIsAdding(false)}
-              >
+              <Button size="sm" variant="ghost" onClick={() => setIsAdding(false)}>
                 Cancel
               </Button>
             </div>
@@ -357,8 +419,8 @@ function TodoPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-6">
-      <h1 className="text-2xl font-bold">Kanban Board</h1>
+    <div className="flex flex-col gap-4 p-4">
+      <h1 className="text-2xl font-bold">Todo Kanban Board</h1>
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <div className="flex gap-4 overflow-x-auto pb-4">
