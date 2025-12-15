@@ -310,7 +310,6 @@ function UsersPage() {
           user={changePasswordUser}
           onOpenChange={(v) => v || setChangePasswordUser(null)}
           onSuccess={() => {
-            refetchUsers();
             toast.success(
               `Password for user ${changePasswordUser.email} has been changed`,
             );
