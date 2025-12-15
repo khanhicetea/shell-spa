@@ -6,10 +6,6 @@ import * as schema from "@/lib/db/schema";
 import { registerQueryTimeLogging } from "./debug";
 
 const getDatabase = createServerOnlyFn(() => {
-  console.log({
-    connectionString: env.DATABASE_URL,
-    max: parseInt(process.env.DATABASE_MAX_CONNECTIONS || "2", 10),
-  });
   const pool = new Pool({
     connectionString: env.DATABASE_URL,
     max: parseInt(process.env.DATABASE_MAX_CONNECTIONS || "2", 10),
