@@ -77,9 +77,6 @@ shell-spa/
 
 ### Development
 - `pnpm dev`: Start development server
-- `pnpm db generate`: Generate database migrations
-- `pnpm db push`: Push schema to database
-- `pnpm db studio`: Open Drizzle Studio
 - `pnpm ui add [shadcn-component]`: Add Shadcn UI component
 
 ### Testing
@@ -119,7 +116,7 @@ Protected admin routes (admin role) are handled in `src/routes/admin/route.tsx` 
 - **Public Page**: Add to `src/routes/`
 - **Admin Page**: Add to `src/routes/admin/`
 - **Protected Page**: Add to `src/routes/(user)/`
-- **Test Page**: Add to `src/routes/(test)/`
+- **Protected User App Page**: Add to `src/routes/(user)/app/`
 
 ### Add New RPC Procedures
 1. Create procedure in `src/rpc/`
@@ -145,6 +142,7 @@ Drizzle ORM schemas are defined in `src/lib/db/schema/`:
 - `[feature].schema.ts`: Contains feature-related tables (all tables related to [feature]), if belongs to user schema, read `auth.schema.ts` first for user-related tables
 - Tables include proper relationships and indexes for optimal performance
 - Schema exports are centralized in `index.ts` for easy imports
+- I will run db migrations task manually, just ask me to run it and wait me for continue.
 
 ### RPC Handlers
 RPC procedures are organized in `src/rpc/handlers/`:
@@ -221,7 +219,18 @@ function UsersPage() {
 - The plan orders : DB schema > RPC handlers > Page route > UI > Check types > DONE
 - Co-locate the sub components in the same file as page route if it only use once in page route
 - Only use pagination if I mentions
-- Each item should be rendered in a separate component so it mutation can be done independently, its status is managed by the component itself
+- **ITEM** : Each item should be rendered in a separate component so it mutation can be done independently, its status is managed by the component itself
+- App user feature, add link into `src/components/app/app-sidebar.tsx`
+- Admin feature, add link into `src/components/admin/admin-sidebar.tsx`
+
+### UI and UX
+- Using shadcn UI components, tailwind css v4
+- UI should be responsive, compact and nice
+- Buttons should has icon from Lucide icons, if icon can common for its purpose, skip text label
+- Form field should has label, error message, vertical first with "space-y-4"
+- For CRUD, if form action is simple, use `Sheet` for adding/editing or `Dialog` component for deleting, confirmation.
+- Table should use Tanstack Table using columns def. No sorting, no column visibility, row actions is last column within 'justify-end'
+- Empty state, use shadcn Empty component in `src/components/ui/empty.tsx`
 
 ### Environment Configuration
 Type-safe environment variables are configured in `src/env/`:
