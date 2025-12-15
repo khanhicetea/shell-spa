@@ -80,7 +80,7 @@ export function NavUser() {
             <DropdownMenuGroup>
               <DropdownMenuItem
                 onClick={() => {
-                  navigate({ to: "/app/settings" });
+                  navigate({ to: "/auth/settings" });
                 }}
               >
                 <BadgeCheck />

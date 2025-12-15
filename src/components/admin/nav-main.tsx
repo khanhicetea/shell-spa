@@ -26,7 +26,7 @@ export function NavMain() {
     },
     {
       title: "Settings",
-      url: "/settings",
+      url: "/auth/settings",
       icon: SettingsIcon,
     },
   ];

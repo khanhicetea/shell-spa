@@ -1,12 +1,4 @@
-import { AuthUIProvider } from "@daveyplate/better-auth-ui";
-import {
-  createFileRoute,
-  Link,
-  Outlet,
-  redirect,
-  useNavigate,
-} from "@tanstack/react-router";
-import authClient from "@/lib/auth/auth-client";
+import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { authQueryOptions } from "@/lib/queries";
 import { ShellProgressBar } from "@/components/spa/shell-progress-bar";
 import { ProgressProvider } from "@bprogress/react";
@@ -30,8 +22,6 @@ export const Route = createFileRoute("/(user)")({
 });
 
 function UserLayout() {
-  const navigate = useNavigate();
-
   return (
     <ProgressProvider
       color="gray"
@@ -39,31 +29,8 @@ function UserLayout() {
       startPosition={0.25}
       options={{ showSpinner: false }}
     >
-      <AuthUIProvider
-        authClient={authClient}
-        navigate={(href) => {
-          navigate({ to: href });
-        }}
-        Link={NavLink}
-      >
-        <Outlet />
-        <ShellProgressBar />
-      </AuthUIProvider>
+      <Outlet />
+      <ShellProgressBar />
     </ProgressProvider>
-  );
-}
-
-function NavLink({
-  href,
-  children,
-  ...props
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link to={href} {...props}>
-      {children}
-    </Link>
   );
 }
