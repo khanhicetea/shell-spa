@@ -3,7 +3,7 @@ import { CompressionPlugin, RPCHandler } from "@orpc/server/fetch";
 import { BatchHandlerPlugin } from "@orpc/server/plugins";
 import { createFileRoute } from "@tanstack/react-router";
 import * as z from "zod";
-import { tryAuthMiddleware } from "@/lib/auth/middleware";
+import { tryAuthMiddleware } from "@/lib/middlewares";
 import { rpcRouter } from "@/rpc/router";
 
 const plugins = [
@@ -26,9 +26,7 @@ const handler = new RPCHandler(rpcRouter, {
         error.cause instanceof ValidationError
       ) {
         // If you only use Zod you can safely cast to ZodIssue[]
-        const zodError = new z.ZodError(
-          error.cause.issues as z.core.$ZodIssue[],
-        );
+        const zodError = new z.ZodError(error.cause.issues as z.core.$ZodIssue[]);
 
         throw new ORPCError("INPUT_VALIDATION_FAILED", {
           status: 422,
@@ -61,6 +59,7 @@ export const Route = createFileRoute("/api/rpc/$")({
           context: {
             headers: request.headers,
             session: context.session,
+            db: context.db,
           },
         });
 

@@ -1,6 +1,5 @@
 import { count, desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { db } from "@/lib/db";
 import { user as userTable } from "@/lib/db/schema/auth.schema";
 import { adminProcedure } from "../base";
 
@@ -10,7 +9,8 @@ export const listUsers = adminProcedure
       page: z.number().int().positive().catch(1),
     }),
   )
-  .handler(async ({ input }) => {
+  .handler(async ({ input, context }) => {
+    const { db } = context;
     const { page } = input;
     const limit = 10;
     const offset = (page - 1) * limit;
@@ -35,7 +35,8 @@ export const listUsers = adminProcedure
 
 export const getUserById = adminProcedure
   .input(z.object({ id: z.string() }))
-  .handler(async ({ input }) => {
+  .handler(async ({ input, context }) => {
+    const { db } = context;
     const foundUser = await db.query.user.findFirst({
       where: eq(userTable.id, input.id),
     });
