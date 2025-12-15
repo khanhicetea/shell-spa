@@ -1,5 +1,5 @@
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   type ColumnDef,
   flexRender,
@@ -20,7 +20,7 @@ import {
   Trash2Icon,
   UserSearchIcon,
 } from "lucide-react";
-import * as React from "react";
+import { useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -91,40 +91,25 @@ function UsersPage() {
     }),
   );
   const navigate = Route.useNavigate();
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [bannedUser, setBannedUser] = React.useState<User | null>(null);
-  const [changePasswordUser, setChangePasswordUser] = React.useState<User | null>(null);
+  const [rowSelection, setRowSelection] = useState({});
+  const [bannedUser, setBannedUser] = useState<User | null>(null);
+  const [changePasswordUser, setChangePasswordUser] = useState<User | null>(null);
 
   const actionsColumns: ColumnDef<User>[] = [
     {
       id: "actions",
       cell: ({ row }) => {
         const user = row.original;
-        const [isPendingUnban, setIsPendingUnban] = React.useState(false);
-
         return (
           <div className="flex flex-row space-x-2 justify-end">
             {user.banned ? (
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={isPendingUnban}
-                onClick={async () => {
-                  setIsPendingUnban(true);
-                  const res = await authClient.admin.unbanUser({
-                    userId: user.id,
-                  });
-                  if (res.error === null) {
-                    refetchUsers();
-                    toast.success(`User ${user.email} has been unbanned`);
-                  } else {
-                    setIsPendingUnban(false);
-                  }
+              <UnbanUserButton
+                user={user}
+                onSuccess={() => {
+                  refetchUsers();
+                  toast.success(`User ${user.email} has been unbanned`);
                 }}
-              >
-                <FlagIcon />
-                Unban
-              </Button>
+              />
             ) : (
               <Button
                 variant="outline"
@@ -320,6 +305,28 @@ export const columns: ColumnDef<User>[] = [
   },
 ];
 
+function UnbanUserButton({ user, onSuccess }: { user: User; onSuccess: () => void }) {
+  const [isPendingUnban, setIsPendingUnban] = useState(false);
+
+  const handleUnban = async () => {
+    setIsPendingUnban(true);
+    const res = await authClient.admin.unbanUser({
+      userId: user.id,
+    });
+    if (res.error === null) {
+      onSuccess();
+    } else {
+      setIsPendingUnban(false);
+    }
+  };
+
+  return (
+    <Button size="sm" variant="outline" onClick={handleUnban} disabled={isPendingUnban}>
+      <FlagIcon /> Unban
+    </Button>
+  );
+}
+
 function BanUserForm({
   user,
   onOpenChange,
@@ -424,7 +431,7 @@ function ChangePasswordForm({
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }) {
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<{ newPassword: string }>({
     defaultValues: {
@@ -542,10 +549,10 @@ function CreateUserForm({
   trigger,
   onSuccess,
 }: {
-  trigger: React.ReactNode;
+  trigger: ReactNode;
   onSuccess: (user: UserWithRole) => void;
 }) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const form = useForm<CreateUser>({
     defaultValues: {

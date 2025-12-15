@@ -16,10 +16,13 @@ import {
   useSensor,
 } from "@dnd-kit/core";
 import { orpc } from "@/lib/orpc";
+import type { Outputs } from "@/rpc/types";
 
 export const Route = createFileRoute("/(user)/app/todo")({
   component: TodoPage,
 });
+
+type TodoItem = Outputs["todoItem"]["listTodos"][number];
 
 function TodoPage() {
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -53,7 +56,7 @@ function TodoPage() {
       acc[todo.categoryId].push(todo);
       return acc;
     },
-    {} as Record<string, any[]>,
+    {} as Record<string, TodoItem[]>,
   );
 
   const mouseSensor = useSensor(MouseSensor, {
@@ -123,7 +126,7 @@ function TodoPage() {
   );
 }
 
-function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
+function TodoCard({ todo, onRefetch }: { todo: TodoItem; onRefetch: () => void }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: todo.id,
   });
@@ -242,7 +245,7 @@ function CategoryColumn({
   onRefetch,
 }: {
   category: any;
-  todos: any[];
+  todos: TodoItem[];
   onRefetch: () => void;
 }) {
   const [isAdding, setIsAdding] = useState(false);

@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { authQueryOptions } from "@/lib/queries";
 import { ShellProgressBar } from "@/components/spa/shell-progress-bar";
 
