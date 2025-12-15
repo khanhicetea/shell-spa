@@ -38,6 +38,7 @@ export const updateTodo = authedProcedure
       id: z.string(),
       content: z.string().min(1).optional(),
       completedAt: z.date().nullable().optional(),
+      categoryId: z.string().optional(),
     }),
   )
   .handler(async ({ input }) => {

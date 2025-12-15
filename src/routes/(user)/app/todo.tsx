@@ -5,7 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Trash2 } from "lucide-react";
+import { Trash2, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  DragOverlay,
+  useDraggable,
+  useDroppable,
+  MouseSensor,
+  TouchSensor,
+  useSensors,
+  useSensor,
+} from "@dnd-kit/core";
 import { orpc } from "@/lib/orpc";
 
 export const Route = createFileRoute("/(user)/app/todo")({
@@ -13,6 +23,11 @@ export const Route = createFileRoute("/(user)/app/todo")({
 });
 
 function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: todo.id,
+    });
+
   const updateMutation = useMutation(
     orpc.todo.updateTodo.mutationOptions({
       onSuccess: () => onRefetch(),
@@ -36,10 +51,31 @@ function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
     deleteMutation.mutate({ id: todo.id });
   };
 
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined;
+
   return (
-    <Card className="mb-2 hover:shadow-md transition-shadow duration-200 border-muted">
+    <Card
+      ref={setNodeRef}
+      style={style}
+      className={`mb-2 hover:shadow-md transition-shadow duration-200 border-muted ${
+        isDragging ? "opacity-50" : ""
+      }`}
+    >
       <CardContent className="p-2">
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0 cursor-grab active:cursor-grabbing"
+            {...listeners}
+            {...attributes}
+          >
+            <GripVertical className="h-3 w-3" />
+          </Button>
           <Checkbox
             checked={!!todo.completedAt}
             onCheckedChange={handleToggleComplete}
@@ -82,6 +118,10 @@ function CategoryColumn({
   const [isAdding, setIsAdding] = useState(false);
   const [newTodoContent, setNewTodoContent] = useState("");
 
+  const { setNodeRef, isOver } = useDroppable({
+    id: category.id,
+  });
+
   const createMutation = useMutation(
     orpc.todo.createTodo.mutationOptions({
       onSuccess: () => {
@@ -103,7 +143,12 @@ function CategoryColumn({
 
   return (
     <div className="flex-shrink-0 w-64">
-      <div className="bg-muted/50 rounded-lg p-4 h-fit">
+      <div
+        ref={setNodeRef}
+        className={`bg-muted/50 rounded-lg p-4 h-fit transition-colors ${
+          isOver ? "bg-muted/70" : ""
+        }`}
+      >
         <h3 className="font-semibold text-sm mb-3">{category.name}</h3>
         <div className="space-y-2">
           {todos.map((todo) => (
@@ -187,6 +232,44 @@ function TodoPage() {
     {} as Record<string, any[]>,
   );
 
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 8,
+    },
+  });
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 200,
+      tolerance: 8,
+    },
+  });
+  const sensors = useSensors(mouseSensor, touchSensor);
+
+  const updateTodoMutation = useMutation(
+    orpc.todo.updateTodo.mutationOptions({
+      onSuccess: () => {
+        refetchTodos();
+      },
+    }),
+  );
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const todoId = active.id;
+    const newCategoryId = over.id;
+
+    const todo = todos.find((t) => t.id === todoId);
+    if (!todo || todo.categoryId === newCategoryId) return;
+
+    updateTodoMutation.mutate({
+      id: todoId,
+      categoryId: newCategoryId,
+    });
+  };
+
   return (
     <div className="flex flex-col gap-4 p-6">
       <h1 className="text-2xl font-bold">Kanban Board</h1>
@@ -207,24 +290,26 @@ function TodoPage() {
         </Button>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-4">
-        {categories.map((category) => (
-          <CategoryColumn
-            key={category.id}
-            category={category}
-            todos={groupedTodos[category.id] || []}
-            onRefetch={() => {
-              refetchTodos();
-              refetchCategories();
-            }}
-          />
-        ))}
-        {categories.length === 0 && (
-          <p className="text-center text-muted-foreground">
-            No categories yet. Add one above.
-          </p>
-        )}
-      </div>
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <div className="flex gap-4 overflow-x-auto pb-4">
+          {categories.map((category) => (
+            <CategoryColumn
+              key={category.id}
+              category={category}
+              todos={groupedTodos[category.id] || []}
+              onRefetch={() => {
+                refetchTodos();
+                refetchCategories();
+              }}
+            />
+          ))}
+          {categories.length === 0 && (
+            <p className="text-center text-muted-foreground">
+              No categories yet. Add one above.
+            </p>
+          )}
+        </div>
+      </DndContext>
     </div>
   );
 }
