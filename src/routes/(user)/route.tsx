@@ -9,6 +9,7 @@ import {
 import authClient from "@/lib/auth/auth-client";
 import { authQueryOptions } from "@/lib/queries";
 import { ShellProgressBar } from "@/components/spa/shell-progress-bar";
+import { ProgressProvider } from "@bprogress/react";
 
 export const Route = createFileRoute("/(user)")({
   component: UserLayout,
@@ -32,16 +33,23 @@ function UserLayout() {
   const navigate = useNavigate();
 
   return (
-    <AuthUIProvider
-      authClient={authClient}
-      navigate={(href) => {
-        navigate({ to: href });
-      }}
-      Link={NavLink}
+    <ProgressProvider
+      color="gray"
+      delay={125}
+      startPosition={0.25}
+      options={{ showSpinner: false }}
     >
-      <Outlet />
-      <ShellProgressBar />
-    </AuthUIProvider>
+      <AuthUIProvider
+        authClient={authClient}
+        navigate={(href) => {
+          navigate({ to: href });
+        }}
+        Link={NavLink}
+      >
+        <Outlet />
+        <ShellProgressBar />
+      </AuthUIProvider>
+    </ProgressProvider>
   );
 }
 

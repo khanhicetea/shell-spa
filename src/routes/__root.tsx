@@ -13,10 +13,10 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import type React from "react";
 import { ThemeProvider } from "@/components/spa/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { ProgressProvider } from "@bprogress/react";
 import type { RPCClient } from "@/lib/orpc";
 import { type AuthQueryResult, authQueryOptions, shellQueryOptions } from "@/lib/queries";
 import appCss from "@/styles.css?url";
-import { ProgressProvider } from "@bprogress/react";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -63,14 +63,8 @@ export const Route = createRootRouteWithContext<{
 function RootComponent() {
   return (
     <ThemeProvider>
-      <ProgressProvider
-        color="gray"
-        delay={125}
-        startPosition={0.25}
-        options={{ showSpinner: false }}
-      >
-        <Outlet />
-      </ProgressProvider>
+      <Outlet />
+
       <Toaster richColors />
 
       <TanStackDevtools
