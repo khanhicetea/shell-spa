@@ -197,6 +197,68 @@ function CategoryColumn({
   );
 }
 
+function AddCategoryColumn({
+  newCategoryName,
+  setNewCategoryName,
+  onAdd,
+  isPending,
+}: {
+  newCategoryName: string;
+  setNewCategoryName: (name: string) => void;
+  onAdd: () => void;
+  isPending: boolean;
+}) {
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAdd = () => {
+    onAdd();
+    setIsAdding(false);
+  };
+
+  return (
+    <div className="flex-shrink-0 w-64">
+      <div className="bg-muted/30 border-2 border-dashed border-muted-foreground/30 rounded-lg p-4 h-fit min-h-[200px] flex items-center justify-center">
+        {isAdding ? (
+          <div className="w-full space-y-2">
+            <Input
+              placeholder="Category name..."
+              value={newCategoryName}
+              onChange={(e) => setNewCategoryName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+              className="h-8"
+              autoFocus
+            />
+            <div className="flex gap-1">
+              <Button size="sm" onClick={handleAdd} disabled={isPending}>
+                Add
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setIsAdding(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Button
+            variant="ghost"
+            onClick={() => setIsAdding(true)}
+            className="w-full h-16 text-muted-foreground hover:text-foreground"
+          >
+            <div className="flex flex-col items-center gap-1">
+              <div className="text-2xl">+</div>
+              <div>Add Column</div>
+            </div>
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
 function TodoPage() {
   const [newCategoryName, setNewCategoryName] = useState("");
 
@@ -274,22 +336,6 @@ function TodoPage() {
     <div className="flex flex-col gap-4 p-6">
       <h1 className="text-2xl font-bold">Kanban Board</h1>
 
-      <div className="flex gap-2">
-        <Input
-          placeholder="Add a new category..."
-          value={newCategoryName}
-          onChange={(e) => setNewCategoryName(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleAddCategory()}
-          className="max-w-xs"
-        />
-        <Button
-          onClick={handleAddCategory}
-          disabled={createCategoryMutation.isPending}
-        >
-          Add Category
-        </Button>
-      </div>
-
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <div className="flex gap-4 overflow-x-auto pb-4">
           {categories.map((category) => (
@@ -303,11 +349,12 @@ function TodoPage() {
               }}
             />
           ))}
-          {categories.length === 0 && (
-            <p className="text-center text-muted-foreground">
-              No categories yet. Add one above.
-            </p>
-          )}
+          <AddCategoryColumn
+            newCategoryName={newCategoryName}
+            setNewCategoryName={setNewCategoryName}
+            onAdd={handleAddCategory}
+            isPending={createCategoryMutation.isPending}
+          />
         </div>
       </DndContext>
     </div>
