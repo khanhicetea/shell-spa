@@ -14,7 +14,7 @@ This is a minimal project implementing the Shell SPA pattern, which balances SSR
 - **TanStack Start**: Full-stack React framework
 - **TanStack Router**: Type-safe routing
 - **TanStack Query**: Server state management
-- **oRPC**: Type-safe RPC for API
+- **oRPC**: Type-safe RPC for API (oRPC, not tRPC so don't make mistakes here), if you need more example about oRPC, read `src/rpc/base.ts`, `src/rpc/router.ts`,  `src/rpc/handlers/user.ts`,  `src/rpc/handlers/app.ts`
 - **Better Auth**: Modern authentication
 - **Drizzle ORM**: Type-safe SQL queries
 - **shadcn/ui**: Accessible component library
