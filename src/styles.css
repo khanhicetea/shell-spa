@@ -2,7 +2,6 @@
 
 @import "tw-animate-css";
 @import "@daveyplate/better-auth-ui/css";
-@import "@bprogress/core/css";
 
 @custom-variant dark (&:is(.dark *));
 
