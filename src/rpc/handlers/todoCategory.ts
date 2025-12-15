@@ -1,13 +1,13 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { category as categoryTable } from "@/lib/db/schema/todo.schema";
+import { todoCategory as todoCategoryTable } from "@/lib/db/schema/todo.schema";
 import { authedProcedure } from "../base";
 
 export const listCategories = authedProcedure.handler(async ({ context }) => {
-  const categories = await db.query.category.findMany({
-    where: eq(categoryTable.userId, context.user.id),
-    orderBy: [categoryTable.createdAt],
+  const categories = await db.query.todoCategory.findMany({
+    where: eq(todoCategoryTable.userId, context.user.id),
+    orderBy: [todoCategoryTable.createdAt],
   });
   return categories;
 });
@@ -20,7 +20,7 @@ export const createCategory = authedProcedure
   )
   .handler(async ({ input, context }) => {
     const [newCategory] = await db
-      .insert(categoryTable)
+      .insert(todoCategoryTable)
       .values({
         id: crypto.randomUUID(),
         userId: context.user.id,
@@ -40,12 +40,12 @@ export const updateCategory = authedProcedure
   .handler(async ({ input }) => {
     const { id, ...updates } = input;
     const [updatedCategory] = await db
-      .update(categoryTable)
+      .update(todoCategoryTable)
       .set({
         ...updates,
         updatedAt: new Date(),
       })
-      .where(eq(categoryTable.id, id))
+      .where(eq(todoCategoryTable.id, id))
       .returning();
     return updatedCategory;
   });
@@ -53,6 +53,8 @@ export const updateCategory = authedProcedure
 export const deleteCategory = authedProcedure
   .input(z.object({ id: z.string() }))
   .handler(async ({ input }) => {
-    await db.delete(categoryTable).where(eq(categoryTable.id, input.id));
+    await db
+      .delete(todoCategoryTable)
+      .where(eq(todoCategoryTable.id, input.id));
     return { success: true };
   });

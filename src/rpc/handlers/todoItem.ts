@@ -1,13 +1,13 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { todo as todoTable } from "@/lib/db/schema/todo.schema";
+import { todoItem as todoItemTable } from "@/lib/db/schema/todo.schema";
 import { authedProcedure } from "../base";
 
 export const listTodos = authedProcedure.handler(async ({ context }) => {
-  const todos = await db.query.todo.findMany({
-    where: eq(todoTable.userId, context.user.id),
-    orderBy: [todoTable.createdAt],
+  const todos = await db.query.todoItem.findMany({
+    where: eq(todoItemTable.userId, context.user.id),
+    orderBy: [todoItemTable.createdAt],
   });
   return todos;
 });
@@ -21,7 +21,7 @@ export const createTodo = authedProcedure
   )
   .handler(async ({ input, context }) => {
     const [newTodo] = await db
-      .insert(todoTable)
+      .insert(todoItemTable)
       .values({
         id: crypto.randomUUID(),
         userId: context.user.id,
@@ -44,12 +44,12 @@ export const updateTodo = authedProcedure
   .handler(async ({ input }) => {
     const { id, ...updates } = input;
     const [updatedTodo] = await db
-      .update(todoTable)
+      .update(todoItemTable)
       .set({
         ...updates,
         updatedAt: new Date(),
       })
-      .where(eq(todoTable.id, id))
+      .where(eq(todoItemTable.id, id))
       .returning();
     return updatedTodo;
   });
@@ -57,6 +57,6 @@ export const updateTodo = authedProcedure
 export const deleteTodo = authedProcedure
   .input(z.object({ id: z.string() }))
   .handler(async ({ input }) => {
-    await db.delete(todoTable).where(eq(todoTable.id, input.id));
+    await db.delete(todoItemTable).where(eq(todoItemTable.id, input.id));
     return { success: true };
   });

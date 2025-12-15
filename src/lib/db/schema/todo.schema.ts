@@ -2,8 +2,8 @@ import { relations } from "drizzle-orm";
 import { index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./auth.schema";
 
-export const category = pgTable(
-  "category",
+export const todoCategory = pgTable(
+  "todo_category",
   {
     id: text("id").primaryKey(),
     userId: text("user_id")
@@ -15,11 +15,11 @@ export const category = pgTable(
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
-  (table) => [index("category_userId_idx").on(table.userId)],
+  (table) => [index("todoCategory_userId_idx").on(table.userId)],
 );
 
-export const todo = pgTable(
-  "todo",
+export const todoItem = pgTable(
+  "todo_item",
   {
     id: text("id").primaryKey(),
     userId: text("user_id")
@@ -27,7 +27,7 @@ export const todo = pgTable(
       .references(() => user.id, { onDelete: "cascade" }),
     categoryId: text("category_id")
       .notNull()
-      .references(() => category.id, { onDelete: "cascade" }),
+      .references(() => todoCategory.id, { onDelete: "cascade" }),
     content: text("content").notNull(),
     completedAt: timestamp("completed_at"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -36,26 +36,26 @@ export const todo = pgTable(
       .notNull(),
   },
   (table) => [
-    index("todo_userId_idx").on(table.userId),
-    index("todo_categoryId_idx").on(table.categoryId),
+    index("todoItem_userId_idx").on(table.userId),
+    index("todoItem_categoryId_idx").on(table.categoryId),
   ],
 );
 
-export const categoryRelations = relations(category, ({ one, many }) => ({
+export const todoCategoryRelations = relations(todoCategory, ({ one, many }) => ({
   user: one(user, {
-    fields: [category.userId],
+    fields: [todoCategory.userId],
     references: [user.id],
   }),
-  todos: many(todo),
+  todoItems: many(todoItem),
 }));
 
-export const todoRelations = relations(todo, ({ one }) => ({
+export const todoItemRelations = relations(todoItem, ({ one }) => ({
   user: one(user, {
-    fields: [todo.userId],
+    fields: [todoItem.userId],
     references: [user.id],
   }),
-  category: one(category, {
-    fields: [todo.categoryId],
-    references: [category.id],
+  todoCategory: one(todoCategory, {
+    fields: [todoItem.categoryId],
+    references: [todoCategory.id],
   }),
 }));

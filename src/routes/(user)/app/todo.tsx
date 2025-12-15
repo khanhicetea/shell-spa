@@ -22,15 +22,16 @@ export const Route = createFileRoute("/(user)/app/todo")({
 });
 
 function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: todo.id,
-  });
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: todo.id,
+    });
 
   const [isEditingContent, setIsEditingContent] = useState(false);
   const [editingContent, setEditingContent] = useState(todo.content);
 
   const updateMutation = useMutation(
-    orpc.todo.updateTodo.mutationOptions({
+    orpc.todoItem.updateTodo.mutationOptions({
       onSuccess: () => {
         onRefetch();
         setIsEditingContent(false);
@@ -39,7 +40,7 @@ function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
   );
 
   const deleteMutation = useMutation(
-    orpc.todo.deleteTodo.mutationOptions({
+    orpc.todoItem.deleteTodo.mutationOptions({
       onSuccess: () => onRefetch(),
     }),
   );
@@ -91,7 +92,9 @@ function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
                 value={editingContent}
                 onChange={(e) => setEditingContent(e.target.value)}
                 onBlur={handleSaveContent}
-                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSaveContent()}
+                onKeyDown={(e) =>
+                  e.key === "Enter" && !e.shiftKey && handleSaveContent()
+                }
                 className="w-full text-sm leading-tight wrap-break-words resize-none border-none p-0 focus:ring-0 bg-transparent"
                 rows={Math.max(1, editingContent.split("\n").length)}
                 autoFocus
@@ -151,7 +154,7 @@ function CategoryColumn({
   });
 
   const createMutation = useMutation(
-    orpc.todo.createTodo.mutationOptions({
+    orpc.todoItem.createTodo.mutationOptions({
       onSuccess: () => {
         onRefetch();
         setNewTodoContent("");
@@ -161,7 +164,7 @@ function CategoryColumn({
   );
 
   const deleteCategoryMutation = useMutation(
-    orpc.category.deleteCategory.mutationOptions({
+    orpc.todoCategory.deleteCategory.mutationOptions({
       onSuccess: () => onRefetch(),
     }),
   );
@@ -170,7 +173,7 @@ function CategoryColumn({
   const [editingName, setEditingName] = useState(category.name);
 
   const updateCategoryMutation = useMutation(
-    orpc.category.updateCategory.mutationOptions({
+    orpc.todoCategory.updateCategory.mutationOptions({
       onSuccess: () => {
         onRefetch();
         setIsEditingName(false);
@@ -273,7 +276,11 @@ function CategoryColumn({
               >
                 Add
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => setIsAdding(false)}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setIsAdding(false)}
+              >
                 Cancel
               </Button>
             </div>
@@ -328,7 +335,11 @@ function AddCategoryColumn({
               <Button size="sm" onClick={handleAdd} disabled={isPending}>
                 Add
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => setIsAdding(false)}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setIsAdding(false)}
+              >
                 Cancel
               </Button>
             </div>
@@ -354,15 +365,15 @@ function TodoPage() {
   const [newCategoryName, setNewCategoryName] = useState("");
 
   const { data: categories, refetch: refetchCategories } = useSuspenseQuery(
-    orpc.category.listCategories.queryOptions(),
+    orpc.todoCategory.listCategories.queryOptions(),
   );
 
   const { data: todos, refetch: refetchTodos } = useSuspenseQuery(
-    orpc.todo.listTodos.queryOptions(),
+    orpc.todoItem.listTodos.queryOptions(),
   );
 
   const createCategoryMutation = useMutation(
-    orpc.category.createCategory.mutationOptions({
+    orpc.todoCategory.createCategory.mutationOptions({
       onSuccess: () => {
         refetchCategories();
         setNewCategoryName("");
@@ -399,7 +410,7 @@ function TodoPage() {
   const sensors = useSensors(mouseSensor, touchSensor);
 
   const updateTodoMutation = useMutation(
-    orpc.todo.updateTodo.mutationOptions({
+    orpc.todoItem.updateTodo.mutationOptions({
       onSuccess: () => {
         refetchTodos();
       },
