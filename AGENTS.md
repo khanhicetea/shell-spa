@@ -14,7 +14,7 @@ This is a minimal project implementing the Shell SPA pattern, which balances SSR
 - **TanStack Start**: Full-stack React framework
 - **TanStack Router**: Type-safe routing
 - **TanStack Query**: Server state management
-- **oRPC**: Type-safe RPC for API (oRPC, not tRPC so don't make mistakes here), if you need more example about oRPC, read `src/rpc/base.ts`, `src/rpc/router.ts`,  `src/rpc/handlers/user.ts`,  `src/rpc/handlers/app.ts`
+- **oRPC**: Type-safe RPC for API (oRPC, not tRPC so don't make mistakes here), if you need more example about oRPC, read section "RPC Handlers"
 - **Better Auth**: Modern authentication
 - **Drizzle ORM**: Type-safe SQL queries
 - **shadcn/ui**: Accessible component library
@@ -170,6 +170,7 @@ All server data operations should go through the RPC layer for centralized manag
 - **Queries**: Implement query logic in RPC handlers
 - **Forms**: Handle form submissions via RPC mutations
 - **Mutations**: Centralize all data modifications in RPC procedures
+- **NO OPTIMISTIC UPDATES**: Don't use optimistic updates as a anti-pattern, as it can lead to inconsistencies and bugs. Instead, use pessimistic updates or implement a more robust optimistic update strategy (support concurrent updates)
 - This ensures type safety, consistent error handling, and maintainable code structure
 
 ### Data Fetching Pattern (in page route)
