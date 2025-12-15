@@ -1,20 +1,20 @@
 import { useIsFetching, useIsMutating } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useProgress } from "@bprogress/react";
 
 export function ShellProgressBar() {
   const { start, stop } = useProgress();
   const isFetching = useIsFetching();
   const isMutating = useIsMutating();
-  const isPending = isFetching || isMutating;
+  const pendingRequests = isFetching || isMutating;
 
   useEffect(() => {
-    if (isPending) {
-      start(0.25, 125, true);
-    } else {
-      stop();
+    if (pendingRequests > 0) {
+      start(0.2, 125); // start progress bar if it slower than 125ms, start from 20%
+    } else if (pendingRequests === 0) {
+      stop(20); // should wait another subsequent request for 20ms before stopping
     }
-  }, [isPending]);
+  }, [pendingRequests]);
 
   return null;
 }
