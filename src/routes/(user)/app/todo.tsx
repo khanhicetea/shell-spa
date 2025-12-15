@@ -205,7 +205,7 @@ function CategoryColumn({
   };
 
   return (
-    <div className="flex-shrink-0 w-64">
+    <div className="shrink-0 w-64">
       <div
         ref={setNodeRef}
         className={`bg-muted/50 rounded-lg p-4 h-fit transition-colors ${
@@ -249,6 +249,11 @@ function CategoryColumn({
           {todos.map((todo) => (
             <TodoCard key={todo.id} todo={todo} onRefetch={onRefetch} />
           ))}
+          {isOver && (
+            <Card className="mb-2 border-2 border-dashed border-muted-foreground/50 bg-muted/20 h-16 flex items-center justify-center text-muted-foreground text-sm">
+              Drop here
+            </Card>
+          )}
         </div>
         {isAdding ? (
           <div className="mt-2 space-y-2">
@@ -307,8 +312,8 @@ function AddCategoryColumn({
   };
 
   return (
-    <div className="flex-shrink-0 w-64">
-      <div className="bg-muted/30 border-2 border-dashed border-muted-foreground/30 rounded-lg p-4 h-fit min-h-[200px] flex items-center justify-center">
+    <div className="shrink-0 w-64">
+      <div className="bg-muted/30 border-2 border-dashed border-muted-foreground/30 rounded-lg p-4 h-fit min-h-50 flex items-center justify-center">
         {isAdding ? (
           <div className="w-full space-y-2">
             <Input
