@@ -14,7 +14,7 @@ function HomePage() {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-8 p-4">
       <div className="flex flex-col items-center gap-4 text-center">
-        <h1 className="text-3xl font-bold sm:text-4xl">Shell SPA Boilerplate</h1>
+        <h1 className="text-3xl font-bold sm:text-4xl">Shell SPA</h1>
         <p className="text-muted-foreground max-w-md">
           A minimal starter with SSR shell for auth and SPA for everything else
         </p>
