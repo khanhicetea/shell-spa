@@ -217,7 +217,7 @@ function UsersPage() {
 - Plan first, ask first, implement later
 - Draft the db schema changes before implementing the feature, asking for confirmation
 - The plan orders : DB schema > RPC handlers > Page route > UI > Check types > DONE
-- Co-locate the sub components in the same file as page route if it only use once in page route
+- Co-locate the sub components in the same file as page route (put in below the main page route component) if it only use once in page route
 - Only use pagination if I mentions
 - **ITEM** : Each item should be rendered in a separate component so it mutation can be done independently, its status is managed by the component itself
 - App user feature, add link into `src/components/app/app-sidebar.tsx`

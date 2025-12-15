@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { Spinner } from "@/components/ui/spinner";
 import { Trash2, GripVertical } from "lucide-react";
 import {
   DndContext,
@@ -78,6 +79,11 @@ function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
         isDragging ? "opacity-50" : ""
       }`}
     >
+      {(updateMutation.isPending || deleteMutation.isPending) && (
+        <div className="absolute top-2 left-2">
+          <Spinner className="size-3" />
+        </div>
+      )}
       <CardContent className="p-2">
         <div className="flex items-center gap-2">
           <Checkbox
