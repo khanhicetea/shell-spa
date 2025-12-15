@@ -21,6 +21,7 @@ import { Route as userAppRouteRouteImport } from './routes/(user)/app/route'
 import { Route as userAppIndexRouteImport } from './routes/(user)/app/index'
 import { Route as ApiRpcSplatRouteImport } from './routes/api/rpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as userAppTodoRouteImport } from './routes/(user)/app/todo'
 import { Route as userAppSettingsRouteImport } from './routes/(user)/app/settings'
 import { Route as userAppHelloFormRouteImport } from './routes/(user)/app/hello-form'
 
@@ -82,6 +83,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const userAppTodoRoute = userAppTodoRouteImport.update({
+  id: '/todo',
+  path: '/todo',
+  getParentRoute: () => userAppRouteRoute,
+} as any)
 const userAppSettingsRoute = userAppSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/app/hello-form': typeof userAppHelloFormRoute
   '/app/settings': typeof userAppSettingsRoute
+  '/app/todo': typeof userAppTodoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/app/': typeof userAppIndexRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/app/hello-form': typeof userAppHelloFormRoute
   '/app/settings': typeof userAppSettingsRoute
+  '/app/todo': typeof userAppTodoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/app': typeof userAppIndexRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/(user)/app/hello-form': typeof userAppHelloFormRoute
   '/(user)/app/settings': typeof userAppSettingsRoute
+  '/(user)/app/todo': typeof userAppTodoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
   '/(user)/app/': typeof userAppIndexRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/app/hello-form'
     | '/app/settings'
+    | '/app/todo'
     | '/api/auth/$'
     | '/api/rpc/$'
     | '/app/'
@@ -162,6 +172,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/app/hello-form'
     | '/app/settings'
+    | '/app/todo'
     | '/api/auth/$'
     | '/api/rpc/$'
     | '/app'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/(user)/app/hello-form'
     | '/(user)/app/settings'
+    | '/(user)/app/todo'
     | '/api/auth/$'
     | '/api/rpc/$'
     | '/(user)/app/'
@@ -278,6 +290,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(user)/app/todo': {
+      id: '/(user)/app/todo'
+      path: '/todo'
+      fullPath: '/app/todo'
+      preLoaderRoute: typeof userAppTodoRouteImport
+      parentRoute: typeof userAppRouteRoute
+    }
     '/(user)/app/settings': {
       id: '/(user)/app/settings'
       path: '/settings'
@@ -312,12 +331,14 @@ const authRouteRouteWithChildren = authRouteRoute._addFileChildren(
 interface userAppRouteRouteChildren {
   userAppHelloFormRoute: typeof userAppHelloFormRoute
   userAppSettingsRoute: typeof userAppSettingsRoute
+  userAppTodoRoute: typeof userAppTodoRoute
   userAppIndexRoute: typeof userAppIndexRoute
 }
 
 const userAppRouteRouteChildren: userAppRouteRouteChildren = {
   userAppHelloFormRoute: userAppHelloFormRoute,
   userAppSettingsRoute: userAppSettingsRoute,
+  userAppTodoRoute: userAppTodoRoute,
   userAppIndexRoute: userAppIndexRoute,
 }
 
