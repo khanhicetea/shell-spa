@@ -24,11 +24,6 @@ export function NavMain() {
       url: "/admin/users",
       icon: UsersIcon,
     },
-    {
-      title: "Settings",
-      url: "/auth/settings",
-      icon: SettingsIcon,
-    },
   ];
 
   return (

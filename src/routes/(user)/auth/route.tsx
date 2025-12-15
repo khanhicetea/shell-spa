@@ -35,7 +35,7 @@ function RouteComponent() {
       Link={NavLink}
     >
       <div className="flex flex-col">
-        <div className="absolute top-0 left-0 bg-gray-100">
+        <div className="absolute top-0 left-0 bg-secondary">
           <Button variant="ghost" asChild>
             <Link to="/app" className="block p-2">
               <MoveLeftIcon />

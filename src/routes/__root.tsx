@@ -45,7 +45,7 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "Shell SPA Boilerplate",
+        title: "Shell SPA",
       },
       {
         name: "description",

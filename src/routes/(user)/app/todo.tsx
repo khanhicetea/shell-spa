@@ -324,12 +324,12 @@ function CategoryColumn({
               onChange={(e) => setEditingName(e.target.value)}
               onBlur={handleSaveName}
               onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
-              className="h-6 text-sm font-semibold border-none p-0 focus:ring-0"
+              className="h-5 text-sm font-semibold border-none p-0 focus:ring-0"
               autoFocus
             />
           ) : (
             <span
-              className="font-semibold text-sm cursor-pointer hover:bg-muted/50 px-1 rounded"
+              className="font-semibold text-sm cursor-text hover:bg-muted/50 px-1 rounded"
               onClick={() => {
                 setIsEditingName(true);
                 setEditingName(category.name);

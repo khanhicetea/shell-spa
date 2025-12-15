@@ -23,11 +23,6 @@ export function NavMain() {
       url: "/app/todo",
       icon: ListTodoIcon,
     },
-    {
-      title: "Settings",
-      url: "/auth/settings",
-      icon: SettingsIcon,
-    },
   ];
 
   return (
