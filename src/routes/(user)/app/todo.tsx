@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Spinner } from "@/components/ui/spinner";
 import { Trash2, GripVertical } from "lucide-react";
 import {
   DndContext,
@@ -23,10 +22,9 @@ export const Route = createFileRoute("/(user)/app/todo")({
 });
 
 function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: todo.id,
-    });
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: todo.id,
+  });
 
   const [isEditingContent, setIsEditingContent] = useState(false);
   const [editingContent, setEditingContent] = useState(todo.content);
@@ -79,11 +77,6 @@ function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
         isDragging ? "opacity-50" : ""
       }`}
     >
-      {(updateMutation.isPending || deleteMutation.isPending) && (
-        <div className="absolute top-2 left-2">
-          <Spinner className="size-3" />
-        </div>
-      )}
       <CardContent className="p-2">
         <div className="flex items-center gap-2">
           <Checkbox
@@ -98,9 +91,7 @@ function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
                 value={editingContent}
                 onChange={(e) => setEditingContent(e.target.value)}
                 onBlur={handleSaveContent}
-                onKeyDown={(e) =>
-                  e.key === "Enter" && !e.shiftKey && handleSaveContent()
-                }
+                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSaveContent()}
                 className="w-full text-sm leading-tight wrap-break-words resize-none border-none p-0 focus:ring-0 bg-transparent"
                 rows={Math.max(1, editingContent.split("\n").length)}
                 autoFocus
@@ -282,11 +273,7 @@ function CategoryColumn({
               >
                 Add
               </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setIsAdding(false)}
-              >
+              <Button size="sm" variant="ghost" onClick={() => setIsAdding(false)}>
                 Cancel
               </Button>
             </div>
@@ -341,11 +328,7 @@ function AddCategoryColumn({
               <Button size="sm" onClick={handleAdd} disabled={isPending}>
                 Add
               </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setIsAdding(false)}
-              >
+              <Button size="sm" variant="ghost" onClick={() => setIsAdding(false)}>
                 Cancel
               </Button>
             </div>
