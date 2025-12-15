@@ -142,7 +142,7 @@ The demo form at `src/routes/(test)/hello-form.tsx` shows how to:
 ### Database Schema
 Drizzle ORM schemas are defined in `src/lib/db/schema/`:
 - `auth.schema.ts`: Contains user authentication tables (users, sessions, accounts, verification)
-- `[feature].schema.ts`: Contains feature-related tables (all tables related to [feature])
+- `[feature].schema.ts`: Contains feature-related tables (all tables related to [feature]), if belongs to user schema, read `auth.schema.ts` first for user-related tables
 - Tables include proper relationships and indexes for optimal performance
 - Schema exports are centralized in `index.ts` for easy imports
 
