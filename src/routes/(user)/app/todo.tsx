@@ -132,12 +132,24 @@ function CategoryColumn({
     }),
   );
 
+  const deleteCategoryMutation = useMutation(
+    orpc.category.deleteCategory.mutationOptions({
+      onSuccess: () => onRefetch(),
+    }),
+  );
+
   const handleAddTodo = () => {
     if (newTodoContent.trim()) {
       createMutation.mutate({
         content: newTodoContent.trim(),
         categoryId: category.id,
       });
+    }
+  };
+
+  const handleDeleteCategory = () => {
+    if (todos.length === 0) {
+      deleteCategoryMutation.mutate({ id: category.id });
     }
   };
 
@@ -149,7 +161,20 @@ function CategoryColumn({
           isOver ? "bg-muted/70" : ""
         }`}
       >
-        <h3 className="font-semibold text-sm mb-3">{category.name}</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold text-sm">{category.name}</h3>
+          {todos.length === 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleDeleteCategory}
+              disabled={deleteCategoryMutation.isPending}
+              className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-destructive/10 hover:text-destructive"
+            >
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          )}
+        </div>
         <div className="space-y-2">
           {todos.map((todo) => (
             <TodoCard key={todo.id} todo={todo} onRefetch={onRefetch} />
@@ -257,7 +282,6 @@ function AddCategoryColumn({
     </div>
   );
 }
-
 
 function TodoPage() {
   const [newCategoryName, setNewCategoryName] = useState("");
