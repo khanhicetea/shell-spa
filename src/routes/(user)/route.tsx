@@ -23,12 +23,7 @@ export const Route = createFileRoute("/(user)")({
 
 function UserLayout() {
   return (
-    <ProgressProvider
-      color="gray"
-      delay={125}
-      startPosition={0.25}
-      options={{ showSpinner: false }}
-    >
+    <ProgressProvider color="gray" options={{ showSpinner: false }}>
       <Outlet />
       <ShellProgressBar />
     </ProgressProvider>

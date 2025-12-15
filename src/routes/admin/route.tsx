@@ -11,12 +11,7 @@ export const Route = createFileRoute("/admin")({
 
 function AdminLayout() {
   return (
-    <ProgressProvider
-      color="gray"
-      delay={125}
-      startPosition={0.25}
-      options={{ showSpinner: false }}
-    >
+    <ProgressProvider color="gray" options={{ showSpinner: false }}>
       <SidebarProvider>
         <AdminSidebar />
         <SidebarInset>
