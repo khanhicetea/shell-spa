@@ -61,21 +61,12 @@ function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
     <Card
       ref={setNodeRef}
       style={style}
-      className={`mb-2 hover:shadow-md transition-shadow duration-200 border-muted ${
+      className={`mb-2 hover:shadow-md transition-shadow duration-200 border-muted relative group ${
         isDragging ? "opacity-50" : ""
       }`}
     >
       <CardContent className="p-2">
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 w-6 p-0 cursor-grab active:cursor-grabbing"
-            {...listeners}
-            {...attributes}
-          >
-            <GripVertical className="h-3 w-3" />
-          </Button>
           <Checkbox
             checked={!!todo.completedAt}
             onCheckedChange={handleToggleComplete}
@@ -91,16 +82,25 @@ function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
               {todo.content}
             </p>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleDelete}
-            disabled={deleteMutation.isPending}
-            className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-destructive/10 hover:text-destructive"
-          >
-            <Trash2 className="h-3 w-3" />
-          </Button>
         </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing transition-opacity"
+          {...listeners}
+          {...attributes}
+        >
+          <GripVertical className="h-3 w-3" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleDelete}
+          disabled={deleteMutation.isPending}
+          className="absolute bottom-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive transition-opacity"
+        >
+          <Trash2 className="h-3 w-3" />
+        </Button>
       </CardContent>
     </Card>
   );
