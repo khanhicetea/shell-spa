@@ -92,13 +92,13 @@ function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
                 onChange={(e) => setEditingContent(e.target.value)}
                 onBlur={handleSaveContent}
                 onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSaveContent()}
-                className="w-full text-sm leading-tight break-words resize-none border-none p-0 focus:ring-0 bg-transparent"
+                className="w-full text-sm leading-tight wrap-break-words resize-none border-none p-0 focus:ring-0 bg-transparent"
                 rows={Math.max(1, editingContent.split("\n").length)}
                 autoFocus
               />
             ) : (
               <p
-                className={`text-sm leading-tight break-words cursor-pointer hover:bg-muted/50 px-1 rounded ${
+                className={`text-sm leading-tight wrap-break-words cursor-pointer hover:bg-muted/50 px-1 rounded ${
                   todo.completedAt ? "line-through text-muted-foreground" : ""
                 }`}
                 onClick={() => {
