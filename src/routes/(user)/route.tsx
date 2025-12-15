@@ -1,7 +1,6 @@
 import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { authQueryOptions } from "@/lib/queries";
 import { ShellProgressBar } from "@/components/spa/shell-progress-bar";
-import { ProgressProvider } from "@bprogress/react";
 
 export const Route = createFileRoute("/(user)")({
   component: UserLayout,
@@ -23,9 +22,9 @@ export const Route = createFileRoute("/(user)")({
 
 function UserLayout() {
   return (
-    <ProgressProvider color="gray" options={{ showSpinner: false }}>
+    <>
       <Outlet />
       <ShellProgressBar />
-    </ProgressProvider>
+    </>
   );
 }
