@@ -176,7 +176,9 @@ All server data operations should go through the RPC layer for centralized manag
 - Use `useQuery` for fetching data
 - Use `useMutation` for updating data
 - Prefetch data in Route loader, then use same queryKey in Route component (can leverage orpc key utils)
-- Example
+- Keep simple by using refetch from useQuery, useSuspendQuery instead of invalidation by key in same component
+
+**Example**
 
 ```ts
 export const Route = createFileRoute("/admin/users")({
@@ -201,7 +203,7 @@ function UsersPage() {
   const page = Route.useSearch({ select: (s) => s.page as number }); // sample for reading in query params
   const {
     data: { users, pageCount, pageSize, totalCount },
-    refetch: refetchUsers, // refetch data on invalidation
+    refetch: refetchUsers, // using refetch data on invalidation instead of invalidation by key in same component
   } = useSuspenseQuery(
     orpc.user.listUsers.queryOptions({
       input: { page },
@@ -211,6 +213,14 @@ function UsersPage() {
   // render function below
 }
 ```
+
+### New feature implementation
+- Plan first, ask first, implement later
+- Draft the db schema changes before implementing the feature, asking for confirmation
+- The plan orders : DB schema > RPC handlers > Page route > UI > Check types > DONE
+- Co-locate the sub components in the same file as page route if it only use once in page route
+- Only use pagination if I mentions
+- Each item should be rendered in a separate component so it mutation can be done independently, its status is managed by the component itself
 
 ### Environment Configuration
 Type-safe environment variables are configured in `src/env/`:
