@@ -21,6 +21,108 @@ export const Route = createFileRoute("/(user)/app/todo")({
   component: TodoPage,
 });
 
+function TodoPage() {
+  const [newCategoryName, setNewCategoryName] = useState("");
+
+  const { data: categories, refetch: refetchCategories } = useSuspenseQuery(
+    orpc.todoCategory.listCategories.queryOptions(),
+  );
+
+  const { data: todos, refetch: refetchTodos } = useSuspenseQuery(
+    orpc.todoItem.listTodos.queryOptions(),
+  );
+
+  const createCategoryMutation = useMutation(
+    orpc.todoCategory.createCategory.mutationOptions({
+      onSuccess: () => {
+        refetchCategories();
+        setNewCategoryName("");
+      },
+    }),
+  );
+
+  const handleAddCategory = () => {
+    if (newCategoryName.trim()) {
+      createCategoryMutation.mutate({ name: newCategoryName.trim() });
+    }
+  };
+
+  const groupedTodos = todos.reduce(
+    (acc, todo) => {
+      if (!acc[todo.categoryId]) acc[todo.categoryId] = [];
+      acc[todo.categoryId].push(todo);
+      return acc;
+    },
+    {} as Record<string, any[]>,
+  );
+
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 8,
+    },
+  });
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 200,
+      tolerance: 8,
+    },
+  });
+  const sensors = useSensors(mouseSensor, touchSensor);
+
+  const updateTodoMutation = useMutation(
+    orpc.todoItem.updateTodo.mutationOptions({
+      onSuccess: () => {
+        refetchTodos();
+      },
+    }),
+  );
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+
+    if (!over) return;
+
+    const todoId = active.id;
+    const newCategoryId = over.id;
+
+    const todo = todos.find((t) => t.id === todoId);
+    if (!todo || todo.categoryId === newCategoryId) return;
+
+    updateTodoMutation.mutate({
+      id: todoId,
+      categoryId: newCategoryId,
+    });
+  };
+
+  return (
+    <div className="flex flex-col gap-4 p-4">
+      <h1 className="text-2xl font-bold">Todo Kanban Board</h1>
+
+      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+        <div className="flex gap-4 overflow-x-auto pb-4">
+          {categories.map((category) => (
+            <CategoryColumn
+              key={category.id}
+              category={category}
+              todos={groupedTodos[category.id] || []}
+              onRefetch={() => {
+                refetchTodos();
+                refetchCategories();
+              }}
+            />
+          ))}
+          <AddCategoryColumn
+            newCategoryName={newCategoryName}
+            setNewCategoryName={setNewCategoryName}
+            onAdd={handleAddCategory}
+            isPending={createCategoryMutation.isPending}
+          />
+        </div>
+      </DndContext>
+    </div>
+  );
+}
+
 function TodoCard({ todo, onRefetch }: { todo: any; onRefetch: () => void }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: todo.id,
@@ -346,108 +448,6 @@ function AddCategoryColumn({
           </Button>
         )}
       </div>
-    </div>
-  );
-}
-
-function TodoPage() {
-  const [newCategoryName, setNewCategoryName] = useState("");
-
-  const { data: categories, refetch: refetchCategories } = useSuspenseQuery(
-    orpc.todoCategory.listCategories.queryOptions(),
-  );
-
-  const { data: todos, refetch: refetchTodos } = useSuspenseQuery(
-    orpc.todoItem.listTodos.queryOptions(),
-  );
-
-  const createCategoryMutation = useMutation(
-    orpc.todoCategory.createCategory.mutationOptions({
-      onSuccess: () => {
-        refetchCategories();
-        setNewCategoryName("");
-      },
-    }),
-  );
-
-  const handleAddCategory = () => {
-    if (newCategoryName.trim()) {
-      createCategoryMutation.mutate({ name: newCategoryName.trim() });
-    }
-  };
-
-  const groupedTodos = todos.reduce(
-    (acc, todo) => {
-      if (!acc[todo.categoryId]) acc[todo.categoryId] = [];
-      acc[todo.categoryId].push(todo);
-      return acc;
-    },
-    {} as Record<string, any[]>,
-  );
-
-  const mouseSensor = useSensor(MouseSensor, {
-    activationConstraint: {
-      distance: 8,
-    },
-  });
-  const touchSensor = useSensor(TouchSensor, {
-    activationConstraint: {
-      delay: 200,
-      tolerance: 8,
-    },
-  });
-  const sensors = useSensors(mouseSensor, touchSensor);
-
-  const updateTodoMutation = useMutation(
-    orpc.todoItem.updateTodo.mutationOptions({
-      onSuccess: () => {
-        refetchTodos();
-      },
-    }),
-  );
-
-  const handleDragEnd = (event: any) => {
-    const { active, over } = event;
-
-    if (!over) return;
-
-    const todoId = active.id;
-    const newCategoryId = over.id;
-
-    const todo = todos.find((t) => t.id === todoId);
-    if (!todo || todo.categoryId === newCategoryId) return;
-
-    updateTodoMutation.mutate({
-      id: todoId,
-      categoryId: newCategoryId,
-    });
-  };
-
-  return (
-    <div className="flex flex-col gap-4 p-4">
-      <h1 className="text-2xl font-bold">Todo Kanban Board</h1>
-
-      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-        <div className="flex gap-4 overflow-x-auto pb-4">
-          {categories.map((category) => (
-            <CategoryColumn
-              key={category.id}
-              category={category}
-              todos={groupedTodos[category.id] || []}
-              onRefetch={() => {
-                refetchTodos();
-                refetchCategories();
-              }}
-            />
-          ))}
-          <AddCategoryColumn
-            newCategoryName={newCategoryName}
-            setNewCategoryName={setNewCategoryName}
-            onAdd={handleAddCategory}
-            isPending={createCategoryMutation.isPending}
-          />
-        </div>
-      </DndContext>
     </div>
   );
 }

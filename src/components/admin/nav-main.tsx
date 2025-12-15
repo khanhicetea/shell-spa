@@ -39,6 +39,7 @@ export function NavMain() {
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton tooltip={item.title} asChild>
               <Link
+                viewTransition
                 to={item.url}
                 activeProps={{
                   "data-active": "true",

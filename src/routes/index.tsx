@@ -19,7 +19,7 @@ function HomePage() {
           A minimal starter with SSR shell for auth and SPA for everything else
         </p>
         <Button type="button" asChild className="w-fit" size="lg">
-          <Link to="/hello-form">Go to Hello Form</Link>
+          <Link to="/app/hello-form">Go to Hello Form</Link>
         </Button>
       </div>
 
