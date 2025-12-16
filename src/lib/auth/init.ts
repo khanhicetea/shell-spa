@@ -50,3 +50,6 @@ export const getAuthConfig = createServerOnlyFn((db: DB) =>
     },
   }),
 );
+
+export type ServerAuth = ReturnType<typeof getAuthConfig>;
+export type ServerAuthSession = Awaited<ReturnType<ServerAuth["api"]["getSession"]>>;

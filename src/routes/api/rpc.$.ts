@@ -7,7 +7,7 @@ import { tryAuthMiddleware } from "@/lib/middlewares";
 import { rpcRouter } from "@/rpc/router";
 
 const plugins = [
-  process.env.NODE_ENV === "production" ? new CompressionPlugin() : undefined,
+  process.env.RPC_COMPRESSION !== undefined ? new CompressionPlugin() : undefined,
   new BatchHandlerPlugin(),
 ];
 

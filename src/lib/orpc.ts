@@ -7,7 +7,7 @@ import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 import { rpcRouter } from "@/rpc/router";
-import { getServerSession } from "./auth/auth";
+import { getCurrentDB, getCurrentSession } from "@/env/worker-ctx";
 
 export type RPCClient = RouterClient<typeof rpcRouter>;
 
@@ -16,7 +16,8 @@ const getORPCClient = createIsomorphicFn()
     createRouterClient(rpcRouter, {
       context: async () => ({
         headers: getRequestHeaders(),
-        session: await getServerSession(),
+        db: getCurrentDB(),
+        session: getCurrentSession(),
       }),
     }),
   )

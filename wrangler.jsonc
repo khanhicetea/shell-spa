@@ -1,0 +1,38 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "shell-spa",
+  "compatibility_date": "2025-11-17",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "enable_request_signal",
+    "request_signal_passthrough",
+    "no_handle_cross_request_promise_resolution",
+  ],
+  // "main": "@tanstack/react-start/server-entry",
+  "main": "./src/server.ts",
+  "placement": {
+    "mode": "smart",
+  },
+  "assets": {},
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true,
+      "invocation_logs": true,
+    },
+    "traces": {
+      "enabled": true,
+      "persist": true,
+      "head_sampling_rate": 1,
+    },
+  },
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "67f61b51585e4c9d8736e6935bb9c485",
+    },
+  ],
+}
