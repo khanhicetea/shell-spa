@@ -7,7 +7,7 @@ app = 'shell-spa'
 primary_region = 'iad'
 
 [build]
-  dockerfile = 'fly.Dockerfile'
+  dockerfile = 'Dockerfile'
 
 [http_service]
   internal_port = 3000

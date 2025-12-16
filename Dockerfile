@@ -13,8 +13,9 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies
-# RUN --mount=type=cache,id=pnpm-prod,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm install --frozen-lockfile
+# For buildkit cache
+# RUN --mount=type=cache,id=pnpm-prod,target=/pnpm/store pnpm install --frozen-lockfile
 
 # Build the application
 FROM base AS builder
