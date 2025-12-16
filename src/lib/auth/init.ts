@@ -4,7 +4,7 @@ import { betterAuth } from "better-auth/minimal";
 import { admin } from "better-auth/plugins";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { ac, admin as adminRole, user as userRole } from "./permissions";
-import { DB } from "@/lib/db/init";
+import type { DB } from "@/lib/db/init";
 
 export const getAuthConfig = createServerOnlyFn((db: DB) =>
   betterAuth({

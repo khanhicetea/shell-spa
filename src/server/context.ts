@@ -12,6 +12,12 @@ export type RequestContext = {
 // For Cloudflare Workers
 export const workerCtx = new AsyncLocalStorage<RequestContext>();
 
+export function getRequestHeaders() {
+  const store = workerCtx.getStore();
+  if (!store) throw new Error("No worker context");
+  return store.headers;
+}
+
 export function getCurrentDB() {
   const store = workerCtx.getStore();
   if (!store) throw new Error("No worker context");

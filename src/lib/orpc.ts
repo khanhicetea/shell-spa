@@ -5,9 +5,13 @@ import type { RouterClient } from "@orpc/server";
 import { createRouterClient } from "@orpc/server";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { createIsomorphicFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/react-start/server";
 import { rpcRouter } from "@/rpc/router";
-import { getCurrentDB, getCurrentSession } from "@/server/context";
+import {
+  getCurrentAuth,
+  getCurrentDB,
+  getCurrentSession,
+  getRequestHeaders,
+} from "@/server/context";
 
 export type RPCClient = RouterClient<typeof rpcRouter>;
 
@@ -18,6 +22,7 @@ const getORPCClient = createIsomorphicFn()
         headers: getRequestHeaders(),
         db: getCurrentDB(),
         session: getCurrentSession(),
+        auth: getCurrentAuth(),
       }),
     }),
   )

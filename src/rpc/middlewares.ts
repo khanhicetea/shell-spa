@@ -1,8 +1,8 @@
 import { ORPCError, os } from "@orpc/server";
-import type { AuthSession } from "@/lib/auth/auth";
+import type { ServerAuthSession } from "@/lib/auth/init";
 
 export const authMiddleware = os
-  .$context<{ session: AuthSession }>()
+  .$context<{ session: ServerAuthSession }>()
   .middleware(async ({ context, next }) => {
     if (!context.session) {
       throw new ORPCError("UNAUTHORIZED");
