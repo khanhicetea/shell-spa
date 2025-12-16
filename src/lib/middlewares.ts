@@ -3,7 +3,7 @@ import { createMiddleware } from "@tanstack/react-start";
 import { setResponseStatus } from "@tanstack/react-start/server";
 // import { getDatabase } from "./db/init";
 // import { getAuthConfig } from "./auth/init";
-import { getCurrentAuth, getCurrentDB, getCurrentSession } from "@/env/worker-ctx";
+import { getCurrentAuth, getCurrentDB, getCurrentSession } from "@/server/context";
 
 export const dbMiddleware = createMiddleware().server(async ({ next, context }) => {
   // const db = getDatabase(context.env.HYPERDRIVE.connectionString);

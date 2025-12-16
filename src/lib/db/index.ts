@@ -1,3 +1,4 @@
-import { getDatabase } from "./init";
+// import { getDatabase } from "./init";
 
-export const db = getDatabase();
+// For development only
+// export const db = getDatabase(process.env.DATABASE_URL);

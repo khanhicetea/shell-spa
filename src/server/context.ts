@@ -1,15 +1,16 @@
-import type { ServerAuth, ServerAuthSession } from "@/lib/auth/init";
-import { DB } from "@/lib/db/init";
+import { getAuthConfig, type ServerAuth, type ServerAuthSession } from "@/lib/auth/init";
+import { getDatabase, type DB } from "@/lib/db/init";
 import { AsyncLocalStorage } from "node:async_hooks";
 
-export type WorkerContext = {
+export type RequestContext = {
   headers: Headers;
   auth: ServerAuth;
   session: ServerAuthSession;
   db: DB;
 };
 
-export const workerCtx = new AsyncLocalStorage<WorkerContext>();
+// For Cloudflare Workers
+export const workerCtx = new AsyncLocalStorage<RequestContext>();
 
 export function getCurrentDB() {
   const store = workerCtx.getStore();

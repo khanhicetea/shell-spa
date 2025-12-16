@@ -1,15 +1,17 @@
-import { betterAuthMiddleware } from "@/lib/middlewares";
+import { getCurrentAuth } from "@/server/context";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/api/auth/$")({
   server: {
-    middleware: [betterAuthMiddleware],
+    // middleware: [betterAuthMiddleware],
     handlers: {
       GET: ({ request, context }) => {
-        return context.auth.handler(request);
+        const auth = getCurrentAuth();
+        return auth.handler(request);
       },
       POST: ({ request, context }) => {
-        return context.auth.handler(request);
+        const auth = getCurrentAuth();
+        return auth.handler(request);
       },
     },
   },

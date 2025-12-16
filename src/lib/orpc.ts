@@ -7,7 +7,7 @@ import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { createIsomorphicFn } from "@tanstack/react-start";
 import { getRequestHeaders } from "@tanstack/react-start/server";
 import { rpcRouter } from "@/rpc/router";
-import { getCurrentDB, getCurrentSession } from "@/env/worker-ctx";
+import { getCurrentDB, getCurrentSession } from "@/server/context";
 
 export type RPCClient = RouterClient<typeof rpcRouter>;
 

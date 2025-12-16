@@ -2,7 +2,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
-import { nitro } from "nitro/vite";
+import { cloudflare } from "@cloudflare/vite-plugin";
 import { defineConfig } from "vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 
@@ -12,9 +12,10 @@ export default defineConfig({
     tsConfigPaths({
       projects: ["./tsconfig.json"],
     }),
+    cloudflare({ viteEnvironment: { name: "ssr" } }),
     tanstackStart(),
     // https://tanstack.com/start/latest/docs/framework/react/guide/hosting
-    nitro({ preset: process.env.NITRO_PRESET || undefined }),
+    // nitro({ preset: process.env.NITRO_PRESET || undefined }),
     viteReact({
       // https://react.dev/learn/react-compiler
       babel: {
@@ -30,4 +31,9 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
+  build: {
+    rolldownOptions: {
+      external: ["cloudflare:workers"],
+    },
+  },
 });
