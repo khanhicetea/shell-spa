@@ -225,6 +225,7 @@ function UsersPage() {
 
 ### UI and UX
 - Using shadcn UI components, tailwind css v4
+- Using shadcn theme color variables like primary, secondary, muted, accent, etc. No specific color should be used directly without asking.
 - UI should be responsive, compact and nice
 - Buttons should has icon from Lucide icons, if icon can common for its purpose, skip text label
 - Form field should has label, error message, vertical first with "space-y-4"
@@ -244,7 +245,7 @@ Type-safe environment variables are configured in `src/env/`:
 - **React Query Caching**: 2-minute stale time reduces server calls
 - **Auth Cookie Cache**: 5-minute server-side cache reduces DB queries
 - **Intent-based Preloading**: Faster navigation
-- **React Compiler**: Automatic memoization
+- **React Compiler**: Automatic memoization, so no need manually useCallback, useMemo, memo things.
 - **SSR-Query Integration**: Optimal data fetching
 
 ## Learning Resources
