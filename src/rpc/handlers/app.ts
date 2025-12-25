@@ -6,10 +6,8 @@ export const shellData = baseProcedure.handler(async ({ context }) => {
     app: {
       name: "Shell SPA",
       version: "1.0.0",
-      environment:
-        process.env.NODE_ENV === "production" ? "production" : "development",
+      environment: process.env.NODE_ENV === "production" ? "production" : "development",
       theme: getCookie("theme") || "system",
     },
-    user: context.session?.user || null,
   };
 });

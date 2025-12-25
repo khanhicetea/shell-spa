@@ -2,9 +2,14 @@ import { queryOptions } from "@tanstack/react-query";
 import { rpcClient } from "@/lib/orpc";
 import type { Outputs } from "@/rpc/types";
 
+export const QUERY_KEYS = {
+  shell: ["shell"] as const,
+  auth: ["user"] as const,
+} as const;
+
 export const authQueryOptions = () =>
   queryOptions({
-    queryKey: ["user"],
+    queryKey: QUERY_KEYS.auth,
     queryFn: async ({ signal }) => {
       const user = await rpcClient.auth.getCurrentUser(
         {},
@@ -20,7 +25,7 @@ export const authQueryOptions = () =>
 
 export const shellQueryOptions = () =>
   queryOptions({
-    queryKey: ["shell"],
+    queryKey: QUERY_KEYS.shell,
     queryFn: async ({ signal }) => {
       const shellData = await rpcClient.app.shellData(
         {},
@@ -30,7 +35,9 @@ export const shellQueryOptions = () =>
       );
       return shellData;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes - shell data doesn't change often
+    staleTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
 export type AuthQueryResult = Outputs["auth"]["getCurrentUser"];
