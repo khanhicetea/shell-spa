@@ -20,23 +20,18 @@ import {
   Trash2Icon,
   UserSearchIcon,
 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useState, type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
+import { PagePending } from "@/components/common/page-pending";
 import { PageTitle } from "@/components/common/page-title";
 import { DataTablePagination } from "@/components/data-table/pagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -46,10 +41,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import {
   Sheet,
   SheetContent,
@@ -68,13 +60,12 @@ import {
 } from "@/components/ui/table";
 import authClient from "@/lib/auth/auth-client";
 import { orpc } from "@/lib/orpc";
-
 import type { Outputs } from "@/rpc/types";
 export type User = Outputs["user"]["listUsers"]["users"][number];
 
 export const Route = createFileRoute("/admin/users")({
   component: UsersPage,
-  pendingComponent: UsersPagePending,
+  pendingComponent: PagePending,
   validateSearch: z.object({
     page: z.number().int().positive().catch(1),
   }),
@@ -90,22 +81,6 @@ export const Route = createFileRoute("/admin/users")({
   },
 });
 
-function UsersPagePending() {
-  return (
-    <div className="space-y-4 py-4">
-      <div className="space-y-4">
-        <Skeleton className="h-8 w-48" />
-        <div className="space-y-2">
-          {[...Array(10)].map((_, i) => (
-            <Skeleton key={`skeleton-${i}`} className="h-16 w-full" />
-          ))}
-        </div>
-        <Skeleton className="h-12 w-full" />
-      </div>
-    </div>
-  );
-}
-
 function UsersPage() {
   const page = Route.useSearch({ select: (s) => s.page as number });
   const {
@@ -119,9 +94,7 @@ function UsersPage() {
   const navigate = Route.useNavigate();
   const [rowSelection, setRowSelection] = useState({});
   const [bannedUser, setBannedUser] = useState<User | null>(null);
-  const [changePasswordUser, setChangePasswordUser] = useState<User | null>(
-    null,
-  );
+  const [changePasswordUser, setChangePasswordUser] = useState<User | null>(null);
 
   const actionsColumns: ColumnDef<User>[] = [
     {
@@ -240,26 +213,17 @@ function UsersPage() {
               <TableBody>
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
+                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
                       No results.
                     </TableCell>
                   </TableRow>
@@ -338,19 +302,11 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "role",
     header: "Role",
-    cell: ({ row }) => (
-      <Badge className="capitalize">{row.getValue("role")}</Badge>
-    ),
+    cell: ({ row }) => <Badge className="capitalize">{row.getValue("role")}</Badge>,
   },
 ];
 
-function UnbanUserButton({
-  user,
-  onSuccess,
-}: {
-  user: User;
-  onSuccess: () => void;
-}) {
+function UnbanUserButton({ user, onSuccess }: { user: User; onSuccess: () => void }) {
   const [isPendingUnban, setIsPendingUnban] = useState(false);
 
   const handleUnban = async () => {
@@ -366,12 +322,7 @@ function UnbanUserButton({
   };
 
   return (
-    <Button
-      size="sm"
-      variant="outline"
-      onClick={handleUnban}
-      disabled={isPendingUnban}
-    >
+    <Button size="sm" variant="outline" onClick={handleUnban} disabled={isPendingUnban}>
       <FlagIcon /> Unban
     </Button>
   );
@@ -394,17 +345,12 @@ function BanUserForm({
   });
 
   const banMutation = useMutation({
-    mutationFn: async (data: {
-      banReason: string;
-      banExpire: string | undefined;
-    }) => {
+    mutationFn: async (data: { banReason: string; banExpire: string | undefined }) => {
       const res = await authClient.admin.banUser({
         userId: user.id,
         banReason: data.banReason,
         banExpiresIn: data.banExpire
-          ? Math.floor(
-              (new Date(`${data.banExpire}:00`).getTime() - Date.now()) / 1000,
-            )
+          ? Math.floor((new Date(`${data.banExpire}:00`).getTime() - Date.now()) / 1000)
           : undefined,
       });
 
@@ -495,8 +441,7 @@ function ChangePasswordForm({
   });
 
   const generateRandomPassword = () => {
-    const chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let result = "";
     for (let i = 0; i < 12; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -561,11 +506,9 @@ function ChangePasswordForm({
                           type="button"
                           variant="outline"
                           onClick={() => {
-                            navigator.clipboard
-                              .writeText(field.value)
-                              .then(() => {
-                                toast.success("Password copied to clipboard");
-                              });
+                            navigator.clipboard.writeText(field.value).then(() => {
+                              toast.success("Password copied to clipboard");
+                            });
                           }}
                         >
                           <CopyIcon />
@@ -584,10 +527,7 @@ function ChangePasswordForm({
                 )}
               />
               <div>
-                <Button
-                  disabled={changePasswordMutation.isPending}
-                  type="submit"
-                >
+                <Button disabled={changePasswordMutation.isPending} type="submit">
                   Change Password
                 </Button>
               </div>
@@ -696,11 +636,7 @@ function CreateUserForm({
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Enter password"
-                        {...field}
-                      />
+                      <Input type="password" placeholder="Enter password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -713,16 +649,9 @@ function CreateUserForm({
                   <FormItem>
                     <FormLabel>User role</FormLabel>
                     <FormControl>
-                      <NativeSelect
-                        onChange={field.onChange}
-                        value={field.value}
-                      >
-                        <NativeSelectOption value="user">
-                          User
-                        </NativeSelectOption>
-                        <NativeSelectOption value="admin">
-                          Admin
-                        </NativeSelectOption>
+                      <NativeSelect onChange={field.onChange} value={field.value}>
+                        <NativeSelectOption value="user">User</NativeSelectOption>
+                        <NativeSelectOption value="admin">Admin</NativeSelectOption>
                       </NativeSelect>
                     </FormControl>
                     <FormMessage />
