@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -20,9 +21,26 @@ import type { Outputs } from "@/rpc/types";
 
 export const Route = createFileRoute("/(user)/app/todo")({
   component: TodoPage,
+  pendingComponent: TodoPagePending,
 });
 
 type TodoItem = Outputs["todoItem"]["listTodos"][number];
+
+function TodoPagePending() {
+  return (
+    <div className="flex flex-col gap-4 p-4">
+      <Skeleton className="h-8 w-48" />
+      <div className="flex gap-4 overflow-x-auto pb-4">
+        {[...Array(3)].map((_, i) => (
+          <Skeleton
+            key={`skeleton-column-${i}`}
+            className="shrink-0 w-64 h-96"
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function TodoPage() {
   const [newCategoryName, setNewCategoryName] = useState("");
@@ -126,10 +144,17 @@ function TodoPage() {
   );
 }
 
-function TodoCard({ todo, onRefetch }: { todo: TodoItem; onRefetch: () => void }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-    id: todo.id,
-  });
+function TodoCard({
+  todo,
+  onRefetch,
+}: {
+  todo: TodoItem;
+  onRefetch: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } =
+    useDraggable({
+      id: todo.id,
+    });
 
   const [isEditingContent, setIsEditingContent] = useState(false);
   const [editingContent, setEditingContent] = useState(todo.content);
@@ -196,7 +221,9 @@ function TodoCard({ todo, onRefetch }: { todo: TodoItem; onRefetch: () => void }
                 value={editingContent}
                 onChange={(e) => setEditingContent(e.target.value)}
                 onBlur={handleSaveContent}
-                onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSaveContent()}
+                onKeyDown={(e) =>
+                  e.key === "Enter" && !e.shiftKey && handleSaveContent()
+                }
                 className="w-full text-sm leading-tight wrap-break-words resize-none border-none p-0 focus:ring-0 bg-transparent"
                 rows={Math.max(1, editingContent.split("\n").length)}
                 autoFocus
@@ -378,7 +405,11 @@ function CategoryColumn({
               >
                 Add
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => setIsAdding(false)}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setIsAdding(false)}
+              >
                 Cancel
               </Button>
             </div>
@@ -433,7 +464,11 @@ function AddCategoryColumn({
               <Button size="sm" onClick={handleAdd} disabled={isPending}>
                 Add
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => setIsAdding(false)}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setIsAdding(false)}
+              >
                 Cancel
               </Button>
             </div>

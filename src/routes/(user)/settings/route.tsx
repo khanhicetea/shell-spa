@@ -4,7 +4,7 @@ import authClient from "@/lib/auth/auth-client";
 import { Button } from "@/components/ui/button";
 import { MoveLeftIcon } from "lucide-react";
 
-export const Route = createFileRoute("/(user)/auth")({
+export const Route = createFileRoute("/(user)/settings")({
   component: RouteComponent,
 });
 

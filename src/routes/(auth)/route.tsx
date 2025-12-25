@@ -1,8 +1,10 @@
-import { authQueryOptions } from "@/lib/queries";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { DefaultCatchBoundary } from "@/components/spa/default-catch-boundary";
+import { authQueryOptions } from "@/lib/queries";
 
 export const Route = createFileRoute("/(auth)")({
   component: RouteComponent,
+  errorComponent: DefaultCatchBoundary,
   beforeLoad: async ({ context }) => {
     const REDIRECT_URL = "/";
 

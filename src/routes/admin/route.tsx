@@ -1,10 +1,25 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { DefaultCatchBoundary } from "@/components/spa/default-catch-boundary";
 import { ShellProgressBar } from "@/components/spa/shell-progress-bar";
+import { authQueryOptions } from "@/lib/queries";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
+  errorComponent: DefaultCatchBoundary,
+  beforeLoad: async ({ context }) => {
+    const user = await context.queryClient.ensureQueryData({
+      ...authQueryOptions(),
+      revalidateIfStale: true,
+    });
+
+    if (!user || user.role !== "admin") {
+      throw redirect({ to: "/app" });
+    }
+
+    return { user };
+  },
   ssr: "data-only",
 });
 

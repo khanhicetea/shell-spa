@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { LayoutDashboard, type LucideIcon, SettingsIcon, UsersIcon } from "lucide-react";
+import { LayoutDashboard, type LucideIcon, UsersIcon } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -16,7 +16,7 @@ export function NavMain() {
   }[] = [
     {
       title: "Dashboard",
-      url: "/admin/dashboard",
+      url: "/admin",
       icon: LayoutDashboard,
     },
     {
