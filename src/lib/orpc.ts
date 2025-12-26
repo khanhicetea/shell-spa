@@ -18,12 +18,15 @@ export type RPCClient = RouterClient<typeof rpcRouter>;
 const getORPCClient = createIsomorphicFn()
   .server(() =>
     createRouterClient(rpcRouter, {
-      context: async () => ({
-        headers: getRequestHeaders(),
-        db: getCurrentDB(),
-        session: getCurrentSession(),
-        auth: getCurrentAuth(),
-      }),
+      context: async () => {
+        // create orpc context for server client, this run on server each time Server-RPCClient call handlers
+        return {
+          headers: getRequestHeaders(),
+          db: getCurrentDB(),
+          session: getCurrentSession(),
+          auth: getCurrentAuth(),
+        };
+      },
     }),
   )
   .client((): RPCClient => {
