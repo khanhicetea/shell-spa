@@ -1,6 +1,6 @@
+import type { ServerEntry } from "@tanstack/react-start/server-entry";
 import { getAuthConfig } from "@/lib/auth/init";
 import { getDatabase } from "@/lib/db/init";
-import type { ServerEntry } from "@tanstack/react-start/server-entry";
 import { workerCtx } from "./context";
 
 // Uncomment to enable Cloudflare Worker integration

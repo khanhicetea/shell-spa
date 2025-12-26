@@ -1,6 +1,6 @@
-import { getAuthConfig, type ServerAuth, type ServerAuthSession } from "@/lib/auth/init";
-import { getDatabase, type DB } from "@/lib/db/init";
 import { AsyncLocalStorage } from "node:async_hooks";
+import type { ServerAuth, ServerAuthSession } from "@/lib/auth/init";
+import type { DB } from "@/lib/db/init";
 
 export type RequestContext = {
   headers: Headers;
@@ -9,7 +9,7 @@ export type RequestContext = {
   db: DB;
 };
 
-// For Cloudflare Workers
+// For Async Local Storage
 export const workerCtx = new AsyncLocalStorage<RequestContext>();
 
 export function getRequestHeaders() {
