@@ -8,7 +8,7 @@ export const listUsers = adminProcedure
     }),
   )
   .handler(async ({ input, context }) => {
-    const { db } = context;
+    const { repos, db } = context;
     const { page } = input;
     const limit = 10;
     const offset = (page - 1) * limit;
@@ -23,7 +23,7 @@ export const listUsers = adminProcedure
         .execute(),
       db
         .selectFrom("user")
-        .select((eb) => [eb.fn.count<number>("id").as("count")])
+        .select((eb) => eb.fn.count<number>("id").as("count"))
         .execute(),
     ]);
 
@@ -39,11 +39,6 @@ export const listUsers = adminProcedure
 export const getUserById = adminProcedure
   .input(z.object({ id: z.string() }))
   .handler(async ({ input, context }) => {
-    const { db } = context;
-    const foundUser = await db
-      .selectFrom("user")
-      .selectAll()
-      .where("id", "=", input.id)
-      .executeTakeFirst();
-    return foundUser ?? null;
+    const { repos } = context;
+    return (await repos.user.findById(input.id)) ?? null;
   });

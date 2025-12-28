@@ -1,6 +1,7 @@
 import type { ServerEntry } from "@tanstack/react-start/server-entry";
 import { getAuthConfig } from "@/lib/auth/init";
 import { getDatabase } from "@/lib/db/init";
+import { createRepos } from "@/lib/db/repositories";
 import { workerCtx } from "./context";
 
 export function createCloudflareHandler(serverEntry: ServerEntry) {
@@ -8,6 +9,7 @@ export function createCloudflareHandler(serverEntry: ServerEntry) {
     async fetch(request: Request, env: Env, ctx: ExecutionContext) {
       const db = getDatabase(env.HYPERDRIVE.connectionString);
       const auth = getAuthConfig(db);
+      const repos = createRepos(db);
       const session = await auth.api.getSession({
         headers: request.headers,
       });
@@ -17,6 +19,7 @@ export function createCloudflareHandler(serverEntry: ServerEntry) {
         db,
         auth,
         session,
+        repos,
       };
 
       return workerCtx.run(reqCtx, async () => {

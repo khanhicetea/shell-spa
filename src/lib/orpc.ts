@@ -9,6 +9,7 @@ import { rpcRouter } from "@/rpc/router";
 import {
   getCurrentAuth,
   getCurrentDB,
+  getCurrentRepos,
   getCurrentSession,
   getRequestHeaders,
 } from "@/server/context";
@@ -25,6 +26,7 @@ const getORPCClient = createIsomorphicFn()
           db: getCurrentDB(),
           session: getCurrentSession(),
           auth: getCurrentAuth(),
+          repos: getCurrentRepos(),
         };
       },
     }),

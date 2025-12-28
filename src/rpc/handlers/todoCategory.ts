@@ -2,14 +2,8 @@ import { z } from "zod";
 import { authedProcedure } from "../base";
 
 export const listCategories = authedProcedure.handler(async ({ context }) => {
-  const { db } = context;
-  const categories = await db
-    .selectFrom("todoCategory")
-    .selectAll()
-    .where("userId", "=", context.user.id)
-    .orderBy("createdAt")
-    .execute();
-  return categories;
+  const { repos } = context;
+  return repos.todoCategory.findByUserId(context.user.id);
 });
 
 export const createCategory = authedProcedure
@@ -19,19 +13,15 @@ export const createCategory = authedProcedure
     }),
   )
   .handler(async ({ input, context }) => {
-    const { db } = context;
-    const newCategory = await db
-      .insertInto("todoCategory")
-      .values({
-        id: crypto.randomUUID(),
-        userId: context.user.id,
-        name: input.name,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .returningAll()
-      .executeTakeFirstOrThrow();
-    return newCategory;
+    const { repos } = context;
+    const newCategory = await repos.todoCategory.insertReturn({
+      id: crypto.randomUUID(),
+      userId: context.user.id,
+      name: input.name,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    return newCategory ?? null;
   });
 
 export const updateCategory = authedProcedure
@@ -42,24 +32,19 @@ export const updateCategory = authedProcedure
     }),
   )
   .handler(async ({ input, context }) => {
-    const { db } = context;
+    const { repos } = context;
     const { id, ...updates } = input;
-    const updatedCategory = await db
-      .updateTable("todoCategory")
-      .set({
-        ...updates,
-        updatedAt: new Date(),
-      })
-      .where("id", "=", id)
-      .returningAll()
-      .executeTakeFirstOrThrow();
-    return updatedCategory;
+    const updatedCategory = await repos.todoCategory.updateById(id, {
+      ...updates,
+      updatedAt: new Date(),
+    });
+    return updatedCategory ?? null;
   });
 
 export const deleteCategory = authedProcedure
   .input(z.object({ id: z.string() }))
   .handler(async ({ input, context }) => {
-    const { db } = context;
-    await db.deleteFrom("todoCategory").where("id", "=", input.id).execute();
+    const { repos } = context;
+    await repos.todoCategory.deleteById(input.id);
     return { success: true };
   });

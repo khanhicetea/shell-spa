@@ -1,15 +1,27 @@
 import { redirect } from "@tanstack/react-router";
 import { createMiddleware } from "@tanstack/react-start";
 import { setResponseStatus } from "@tanstack/react-start/server";
-import { getCurrentAuth, getCurrentDB, getCurrentSession } from "@/server/context";
+import {
+  getCurrentAuth,
+  getCurrentDB,
+  getCurrentRepos,
+  getCurrentSession,
+} from "@/server/context";
 
 export const dbMiddleware = createMiddleware().server(async ({ next }) => {
   const db = getCurrentDB();
   return next({ context: { db } });
 });
 
-export const betterAuthMiddleware = createMiddleware()
+export const reposMiddleware = createMiddleware()
   .middleware([dbMiddleware])
+  .server(async ({ next }) => {
+    const repos = getCurrentRepos();
+    return next({ context: { repos } });
+  });
+
+export const betterAuthMiddleware = createMiddleware()
+  .middleware([reposMiddleware])
   .server(async ({ next }) => {
     const auth = getCurrentAuth();
     return next({ context: { auth } });

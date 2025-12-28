@@ -2,14 +2,8 @@ import { z } from "zod";
 import { authedProcedure } from "../base";
 
 export const listTodos = authedProcedure.handler(async ({ context }) => {
-  const { db } = context;
-  const todos = await db
-    .selectFrom("todoItem")
-    .selectAll()
-    .where("userId", "=", context.user.id)
-    .orderBy("createdAt")
-    .execute();
-  return todos;
+  const { repos } = context;
+  return repos.todoItem.findByUserId(context.user.id);
 });
 
 export const createTodo = authedProcedure
@@ -20,20 +14,16 @@ export const createTodo = authedProcedure
     }),
   )
   .handler(async ({ input, context }) => {
-    const { db } = context;
-    const newTodo = await db
-      .insertInto("todoItem")
-      .values({
-        id: crypto.randomUUID(),
-        userId: context.user.id,
-        categoryId: input.categoryId,
-        content: input.content,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .returningAll()
-      .executeTakeFirstOrThrow();
-    return newTodo;
+    const { repos } = context;
+    const newTodo = await repos.todoItem.insertReturn({
+      id: crypto.randomUUID(),
+      userId: context.user.id,
+      categoryId: input.categoryId,
+      content: input.content,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+    return newTodo ?? null;
   });
 
 export const updateTodo = authedProcedure
@@ -46,30 +36,25 @@ export const updateTodo = authedProcedure
     }),
   )
   .handler(async ({ input, context }) => {
-    const { db } = context;
+    const { repos } = context;
     const { id, ...updates } = input;
-    const updatedTodo = await db
-      .updateTable("todoItem")
-      .set({
-        ...(updates.content !== undefined && { content: updates.content }),
-        ...(updates.completedAt !== undefined && {
-          completedAt: updates.completedAt,
-        }),
-        ...(updates.categoryId !== undefined && {
-          categoryId: updates.categoryId,
-        }),
-        updatedAt: new Date(),
-      })
-      .where("id", "=", id)
-      .returningAll()
-      .executeTakeFirstOrThrow();
-    return updatedTodo;
+    const updatedTodo = await repos.todoItem.updateById(id, {
+      ...(updates.content !== undefined && { content: updates.content }),
+      ...(updates.completedAt !== undefined && {
+        completedAt: updates.completedAt,
+      }),
+      ...(updates.categoryId !== undefined && {
+        categoryId: updates.categoryId,
+      }),
+      updatedAt: new Date(),
+    });
+    return updatedTodo ?? null;
   });
 
 export const deleteTodo = authedProcedure
   .input(z.object({ id: z.string() }))
   .handler(async ({ input, context }) => {
-    const { db } = context;
-    await db.deleteFrom("todoItem").where("id", "=", input.id).execute();
+    const { repos } = context;
+    await repos.todoItem.deleteById(input.id);
     return { success: true };
   });

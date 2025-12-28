@@ -3,12 +3,14 @@ import type { ServerEntry } from "@tanstack/react-start/server-entry";
 import { env } from "@/env/server";
 import { getAuthConfig } from "@/lib/auth/init";
 import { getDatabase } from "@/lib/db/init";
+import { createRepos } from "@/lib/db/repositories";
 import { workerCtx } from "./context";
 
 export function createNodeHandler(serverEntry: ServerEntry) {
   // Singleton DB, Auth
   const db = getDatabase(env.DATABASE_URL);
   const auth = getAuthConfig(db);
+  const repos = createRepos(db);
 
   return {
     async fetch(request: Request, opts?: RequestOptions<undefined>) {
@@ -21,6 +23,7 @@ export function createNodeHandler(serverEntry: ServerEntry) {
         db,
         auth,
         session,
+        repos,
       };
 
       return workerCtx.run(reqCtx, async () => {

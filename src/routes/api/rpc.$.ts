@@ -65,6 +65,7 @@ export const Route = createFileRoute("/api/rpc/$")({
             session: context.session,
             db: context.db,
             auth: context.auth,
+            repos: context.repos,
           },
         });
 
