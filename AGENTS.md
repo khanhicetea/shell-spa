@@ -166,13 +166,217 @@ The RPC system includes authentication middleware for protected procedures:
 - Use `adminProcedure` for routes requiring admin role
 
 ### Data Management
-All server data operations should go through the RPC layer for centralized management:
+All server data operations should go through RPC layer for centralized management:
 - **Data Fetching**: Use RPC procedures for all server data retrieval
 - **Queries**: Implement query logic in RPC handlers
 - **Forms**: Handle form submissions via RPC mutations
 - **Mutations**: Centralize all data modifications in RPC procedures
 - **NO OPTIMISTIC UPDATES**: Don't use optimistic updates as a anti-pattern, as it can lead to inconsistencies and bugs. Instead, use pessimistic updates or implement a more robust optimistic update strategy (support concurrent updates)
 - This ensures type safety, consistent error handling, and maintainable code structure
+
+### Repository Pattern
+The project uses a repository pattern for database operations to provide a clean, type-safe abstraction over Kysely queries. Repositories are located in `src/lib/db/repositories/`:
+
+**Structure:**
+```
+src/lib/db/repositories/
+├── base.ts              # BaseRepository interface and Repository class
+├── index.ts             # Exports all repos and createRepos factory
+├── user.repo.ts         # UserRepository
+└── [model].repo.ts     # TodoItemRepository
+```
+
+**Available Repositories:**
+- `repos.user`: User table operations
+- `repos.[model]`: Model table operations
+
+**BaseRepository Methods:**
+- `find<T>(conditions?)` - Find multiple records
+- `findById(id)` - Find record by ID
+- `findOne<T>(conditions)` - Find single record matching conditions
+- `findAll()` - Get all records
+- `findPaginated(page, pageSize, conditions?)` - Paginated results with metadata
+- `count<T>(conditions?)` - Count records
+- `exists(id)` - Check if record exists by ID
+- `existsBy<T>(conditions)` - Check if any record matches conditions
+- `deleteById(id)` - Delete by ID
+- `deleteMany<T>(conditions)` - Delete multiple records
+- `updateById(id, data)` - Update record by ID
+- `updateMany<T>(conditions, data)` - Update multiple records
+- `insertReturn(data)` - Insert single record and return it
+- `insertMany(data[])` - Insert multiple records and return them
+
+**Query Conditions:**
+Repositories support two types of conditions:
+
+1. **Simple object conditions** (partial matches):
+```typescript
+// Simple equality conditions
+const users = await repos.user.find({ email: 'test@test.com', role: 'admin' });
+const todos = await repos.todoItem.find({ userId: 'user-id', completed: null });
+```
+
+2. **Query builder function** (complex queries with full type inference):
+```typescript
+// Complex conditions with full Kysely API
+const users = await repos.user.find((qb) =>
+  qb
+    .where('email', '=', 'test@test.com')
+    .where('role', '=', 'admin')
+    .orderBy('createdAt', 'desc')
+    .limit(10)
+);
+
+// Paginated with ordering
+const result = await repos.user.findPaginated(page, pageSize, (qb) =>
+  qb.orderBy('createdAt', 'desc')
+);
+```
+
+**Usage in RPC Handlers:**
+```typescript
+export const listUsers = adminProcedure
+  .input(z.object({ page: z.number().int().positive() }))
+  .handler(async ({ input, context }) => {
+    const { repos } = context;
+    const { page } = input;
+    const pageSize = 10;
+
+    const result = await repos.user.findPaginated(page, pageSize, (qb) =>
+      qb.orderBy('createdAt', 'desc')
+    );
+
+    return {
+      users: result.items,
+      page,
+      pageSize: result.pageSize,
+      totalCount: result.totalCount,
+      pageCount: result.pageCount,
+    };
+  });
+
+export const getUserById = adminProcedure
+  .input(z.object({ id: z.string() }))
+  .handler(async ({ input, context }) => {
+    const { repos } = context;
+    return (await repos.user.findById(input.id)) ?? null;
+  });
+
+export const deleteUser = adminProcedure
+  .input(z.object({ id: z.string() }))
+  .handler(async ({ input, context }) => {
+    const { repos } = context;
+    await repos.user.deleteById(input.id);
+    return { success: true };
+  });
+```
+
+**Creating New Repositories:**
+1. Create new file in `src/lib/db/repositories/[name].repo.ts`
+2. Extend Repository base class with table name
+3. Add domain-specific methods (only if complex/reusable)
+4. Register in `createRepos()` factory in `index.ts`
+
+**Repository Design Guidelines:**
+
+- **DON'T** create simple one-line wrapper methods like `findByUser`, `findByCategoryId` in concrete repositories
+- **DON'T** pollute repositories with methods that just call **BaseRepository Methods** with simple arguments
+- **DON'T** put methods in UserRepository. If the main subject is Product - put them in ProductRepository
+- **DO** only create methods in repositories when:
+  - Implementation is more than 3 lines of logic
+  - Logic is complex or involves multiple operations
+  - OR Logic is reused in multiple places
+
+**Bad Example (don't do this):**
+```typescript
+// src/lib/db/repositories/todoItem.repo.ts
+export class TodoItemRepository extends Repository<"todoItem"> {
+  async findByUserId(userId: string) {
+    return this.find({ userId }); // Too simple, just use find directly
+  }
+
+  async findByCategoryId(categoryId: string) {
+    return this.find({ categoryId }); // Too simple, just use find directly
+  }
+}
+
+// Usage - just use find directly instead
+const todos = await repos.todoItem.find({ userId: '123' });
+```
+
+**Good Example (do this):**
+```typescript
+// src/lib/db/repositories/product.repo.ts
+import type { DB } from "../init";
+import { Repository } from "./base";
+
+export class ProductRepository extends Repository<"product"> {
+  async searchByKeyword(keyword: string) {
+    return this.find((qb) =>
+      qb.where('name', 'ilike', `%${keyword}%`)
+        .orWhere('description', 'ilike', `%${keyword}%`)
+        .orderBy('popularity', 'desc')
+        .limit(50)
+    );
+  }
+
+  async findAvailableProducts(filters: ProductFilters) {
+    // Complex logic worth extracting
+    return this.find((qb) => {
+      let query = qb.where('stock', '>', 0);
+      if (filters.minPrice) {
+        query = query.where('price', '>=', filters.minPrice);
+      }
+      if (filters.maxPrice) {
+        query = query.where('price', '<=', filters.maxPrice);
+      }
+      return query.orderBy('createdAt', 'desc');
+    });
+  }
+}
+```
+
+Then register in `index.ts`:
+```typescript
+import { ProductRepository } from "./product.repo";
+
+export function createRepos(db: DB) {
+  return {
+    user: new UserRepository(db),
+    todoCategory: new TodoCategoryRepository(db),
+    todoItem: new TodoItemRepository(db),
+    product: new ProductRepository(db), // Add new repo
+  };
+}
+```
+
+**Using Repositories Correctly:**
+
+```typescript
+// ✅ Good - use base methods directly for simple queries
+const todos = await repos.todoItem.find({ userId: '123' });
+const user = await repos.user.findById('456');
+const category = await repos.todoCategory.findOne({ name: 'Work' });
+
+// ✅ Good - use query builder for complex conditions
+const recentTodos = await repos.todoItem.find((qb) =>
+  qb.where('userId', '=', '123')
+    .where('createdAt', '>', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+    .orderBy('createdAt', 'desc')
+);
+
+// ✅ Good - use custom method for reusable complex logic
+const availableProducts = await repos.product.findAvailableProducts({
+  minPrice: 10,
+  maxPrice: 100,
+});
+```
+
+**Repository Context Access:**
+Repositories are available in RPC handlers via `context.repos`:
+- `baseProcedure`, `authedProcedure`, `adminProcedure` all have access to `repos`
+- Each repository is type-safe with full autocomplete
+- All database operations should go through repositories, not direct Kysely queries
 
 ### Data Fetching Pattern (in page route)
 - Use `useQuery` for fetching data

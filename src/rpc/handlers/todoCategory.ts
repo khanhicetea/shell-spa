@@ -3,7 +3,7 @@ import { authedProcedure } from "../base";
 
 export const listCategories = authedProcedure.handler(async ({ context }) => {
   const { repos } = context;
-  return repos.todoCategory.findByUserId(context.user.id);
+  return repos.todoCategory.find({ userId: context.user.id });
 });
 
 export const createCategory = authedProcedure
