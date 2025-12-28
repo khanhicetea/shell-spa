@@ -41,7 +41,7 @@ A minimal starter template that implements the **Shell SPA** pattern - the perfe
 
 ### Database
 
-- **Drizzle ORM** - Type-safe SQL queries
+- **Kysely** - Type-safe SQL query builder
 - **PostgreSQL** - Production-ready database
 - **SQLite** - Local development (file-based)
 
@@ -70,7 +70,7 @@ shell-spa/
 │   │   └── __root.tsx       # Shell implementation
 │   └── rpc/                # RPC procedures
 ├── public/                 # Static assets
-└── drizzle/                # Database migrations
+└── kysely/                 # Database migrations
 ```
 
 ## 🔑 Key Features
@@ -226,7 +226,7 @@ pnpm db generate
 # Push schema to database
 pnpm db push
 
-# Open Drizzle Studio (GUI)
+# Open Kysely Studio (GUI)
 pnpm db studio
 ```
 
@@ -326,7 +326,7 @@ Edit `src/styles.css` for global styles and Tailwind configuration.
 - [TanStack Start Docs](https://tanstack.com/start/latest)
 - [oRPC Documentation](https://orpc.dev/)
 - [Better Auth Docs](https://www.better-auth.com/)
-- [Drizzle ORM Docs](https://orm.drizzle.team/)
+- [Kysely Docs](https://kysely.dev/)
 
 ## 🤝 Contributing
 

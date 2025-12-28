@@ -16,7 +16,7 @@ This is a minimal project implementing the Shell SPA pattern, which balances SSR
 - **TanStack Query**: Server state management
 - **oRPC**: Type-safe RPC for API (oRPC, not tRPC so don't make mistakes here), if you need more example about oRPC, read section "RPC Handlers"
 - **Better Auth**: Modern authentication
-- **Drizzle ORM**: Type-safe SQL queries
+- **Kysely**: Type-safe SQL query builder
 - **shadcn/ui**: Accessible component library
 
 ## Project Structure
@@ -37,7 +37,7 @@ shell-spa/
 │   │   └── __root.tsx       # Shell implementation
 │   └── rpc/                # RPC procedures
 ├── public/                 # Static assets
-└── drizzle/                # Database migrations
+└── kysely/                # Database migrations
 ```
 
 ## Important Files
@@ -137,12 +137,15 @@ The demo form at `src/routes/(test)/hello-form.tsx` shows how to:
 - Display success messages with Sonner toast notifications
 
 ### Database Schema
-Drizzle ORM schemas are defined in `src/lib/db/schema/`:
-- `auth.schema.ts`: Contains user authentication tables (users, sessions, accounts, verification)
-- `[feature].schema.ts`: Contains feature-related tables (all tables related to [feature]), if belongs to user schema, read `auth.schema.ts` first for user-related tables
-- Tables include proper relationships and indexes for optimal performance
-- Schema exports are centralized in `index.ts` for easy imports
-- I will run db migrations task manually, just ask me to run it and wait me for continue.
+Kysely uses TypeScript interfaces for type-safe database queries. Schema definitions are organized in `src/lib/db/schema/`:
+- `schema/auth.ts`: Contains authentication table interfaces (user, session, account, verification)
+- `schema/todo.ts`: Contains feature-related table interfaces (todoCategory, todoItem)
+- `schema/index.ts`: Central Database interface that aggregates all table interfaces
+- Each schema file exports:
+  - `Table` interface (e.g., `UserTable`)
+  - `Selectable` type (e.g., `User`) - for query results
+  - `Insertable` type (e.g., `UserInsert`) - for insert operations
+  - `Updateable` type (e.g., `UserUpdate`) - for update operations
 
 ### RPC Handlers
 RPC procedures are organized in `src/rpc/handlers/`:
@@ -253,4 +256,4 @@ Type-safe environment variables are configured in `src/env/`:
 - [TanStack Start Docs](https://tanstack.com/start/latest)
 - [oRPC Documentation](https://orpc.dev/)
 - [Better Auth Docs](https://www.better-auth.com/)
-- [Drizzle ORM Docs](https://orm.drizzle.team/)
+- [Kysely Docs](https://kysely.dev/)

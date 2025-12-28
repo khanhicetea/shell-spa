@@ -1,10 +1,5 @@
-import type {
-  UserTable,
-  SessionTable,
-  AccountTable,
-  VerificationTable,
-} from "./schema/auth";
-import type { TodoCategoryTable, TodoItemTable } from "./schema/todo";
+import type { UserTable, SessionTable, AccountTable, VerificationTable } from "./auth";
+import type { TodoCategoryTable, TodoItemTable } from "./todo";
 
 export interface Database {
   user: UserTable;
