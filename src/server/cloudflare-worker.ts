@@ -6,6 +6,7 @@ import { workerCtx } from "./context";
 
 export function createCloudflareHandler(serverEntry: ServerEntry) {
   return {
+    // @ts-ignore
     async fetch(request: Request, env: Env, ctx: ExecutionContext) {
       const db = getDatabase(env.HYPERDRIVE.connectionString);
       const auth = getAuthConfig(db);
@@ -26,8 +27,11 @@ export function createCloudflareHandler(serverEntry: ServerEntry) {
         try {
           return serverEntry.fetch(request, {
             context: {
+              // @ts-ignore
               env,
+              // @ts-ignore
               waitUntil: ctx.waitUntil.bind(ctx),
+              // @ts-ignore
               passThroughOnException: ctx.passThroughOnException.bind(ctx),
             },
           });

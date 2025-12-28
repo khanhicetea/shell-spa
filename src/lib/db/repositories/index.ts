@@ -13,7 +13,9 @@ export function createRepos(db: DB) {
   };
 
   // Inject repos reference into each repository for cross-repository access
-  Object.values(repos).forEach((repo) => repo.setRepos(repos));
+  Object.values(repos).forEach((repo) => {
+    repo.setRepos(repos);
+  });
 
   return repos;
 }

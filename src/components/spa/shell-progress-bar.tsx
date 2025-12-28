@@ -1,6 +1,6 @@
 import { useIsFetching, useIsMutating } from "@tanstack/react-query";
 import { useNProgress } from "@tanem/react-nprogress";
-import { useRouter, useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "@tanstack/react-router";
 
 function Container({
   animationDuration,
