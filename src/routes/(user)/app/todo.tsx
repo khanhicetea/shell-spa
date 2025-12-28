@@ -514,8 +514,8 @@ function CategoryColumn({
     <div className="shrink-0 w-72">
       <div
         ref={setNodeRef}
-        className={`rounded-xl border backdrop-blur-sm transition-all duration-200 ${colorScheme.border} ${
-          isOver ? "ring-2 ring-primary/50 scale-[1.02] shadow-lg" : "hover:shadow-md"
+        className={`rounded-xl border backdrop-blur-sm transition-all duration-200 overflow-hidden ${colorScheme.border} ${
+          isOver ? "animate-bounce-subtle shadow-xl shadow-primary/20" : "hover:shadow-md"
         }`}
       >
         {/* Category Header */}
