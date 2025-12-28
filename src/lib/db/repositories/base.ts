@@ -10,17 +10,20 @@ import type {
 import type { DB } from "../init";
 import type { Database } from "../schema";
 
+export class NotFoundError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "NotFoundError";
+  }
+}
+
 export type SelectQueryCondition<T> =
   | Partial<T>
-  | ((
-      qb: SelectQueryBuilder<DB, any, any>,
-    ) => SelectQueryBuilder<DB, any, any>);
+  | ((qb: SelectQueryBuilder<DB, any, any>) => SelectQueryBuilder<DB, any, any>);
 
 export type DeleteQueryCondition<T> =
   | Partial<T>
-  | ((
-      qb: DeleteQueryBuilder<DB, any, any>,
-    ) => DeleteQueryBuilder<DB, any, any>);
+  | ((qb: DeleteQueryBuilder<DB, any, any>) => DeleteQueryBuilder<DB, any, any>);
 
 export type UpdateQueryCondition<T> =
   | Partial<T>
@@ -29,15 +32,23 @@ export type UpdateQueryCondition<T> =
     ) => UpdateQueryBuilder<DB, any, any, any>);
 
 export interface BaseRepository<TTable extends keyof Database> {
-  find<T extends {}>(
+  find<T extends object>(
     conditions?: SelectQueryCondition<T>,
   ): Promise<Selectable<Database[TTable]>[]>;
+  findSelect<T extends object, K extends keyof Selectable<Database[TTable]>>(
+    columns: K[],
+    conditions?: SelectQueryCondition<T>,
+  ): Promise<Pick<Selectable<Database[TTable]>, K>[]>;
   findById(id: unknown): Promise<Selectable<Database[TTable]> | undefined>;
-  findOne<T extends {}>(
+  findByIdOrFail(id: unknown): Promise<Selectable<Database[TTable]>>;
+  findOne<T extends object>(
     conditions: SelectQueryCondition<T>,
   ): Promise<Selectable<Database[TTable]> | undefined>;
+  findOneOrFail<T extends object>(
+    conditions: SelectQueryCondition<T>,
+  ): Promise<Selectable<Database[TTable]>>;
   findAll(): Promise<Selectable<Database[TTable]>[]>;
-  findPaginated<T extends {}>(
+  findPaginated<T extends object>(
     page: number,
     pageSize: number,
     conditions?: SelectQueryCondition<T>,
@@ -48,18 +59,18 @@ export interface BaseRepository<TTable extends keyof Database> {
     page: number;
     pageSize: number;
   }>;
-  count<T extends {}>(conditions?: SelectQueryCondition<T>): Promise<number>;
+  count<T extends object>(conditions?: SelectQueryCondition<T>): Promise<number>;
   exists(id: unknown): Promise<boolean>;
-  existsBy<T extends {}>(conditions: SelectQueryCondition<T>): Promise<boolean>;
+  existsBy<T extends object>(conditions: SelectQueryCondition<T>): Promise<boolean>;
   deleteById(id: unknown): Promise<DeleteResult[]>;
-  deleteMany<T extends {}>(
+  deleteMany<T extends object>(
     conditions: DeleteQueryCondition<T>,
   ): Promise<DeleteResult[]>;
   updateById(
     id: unknown,
     data: Updateable<Database[TTable]>,
   ): Promise<Selectable<Database[TTable]> | undefined>;
-  updateMany<T extends {}>(
+  updateMany<T extends object>(
     conditions: UpdateQueryCondition<T>,
     data: Updateable<Database[TTable]>,
   ): Promise<Selectable<Database[TTable]>[]>;
@@ -69,11 +80,14 @@ export interface BaseRepository<TTable extends keyof Database> {
   insertMany(
     data: Insertable<Database[TTable]>[],
   ): Promise<Selectable<Database[TTable]>[]>;
+  upsert(
+    data: Insertable<Database[TTable]>,
+    conflictColumns: (keyof Selectable<Database[TTable]>)[],
+    updateData?: Partial<Insertable<Database[TTable]>>,
+  ): Promise<Selectable<Database[TTable]> | undefined>;
 }
 
-export class Repository<TTable extends keyof Database>
-  implements BaseRepository<TTable>
-{
+export class Repository<TTable extends keyof Database> implements BaseRepository<TTable> {
   constructor(
     protected db: DB,
     protected tableName: TTable,
@@ -101,7 +115,7 @@ export class Repository<TTable extends keyof Database>
     return query;
   }
 
-  async find<T extends {}>(
+  async find<T extends object>(
     conditions?: SelectQueryCondition<T>,
   ): Promise<Selectable<Database[TTable]>[]> {
     let query = this.db.selectFrom(this.tableName as TTable);
@@ -113,9 +127,18 @@ export class Repository<TTable extends keyof Database>
       .then((rows) => rows as Selectable<Database[TTable]>[]);
   }
 
-  async findById(
-    id: unknown,
-  ): Promise<Selectable<Database[TTable]> | undefined> {
+  async findSelect<T extends object, K extends keyof Selectable<Database[TTable]>>(
+    columns: K[],
+    conditions?: SelectQueryCondition<T>,
+  ): Promise<Pick<Selectable<Database[TTable]>, K>[]> {
+    let query = this.db.selectFrom(this.tableName as TTable);
+    query = this.applyConditions(query, conditions);
+
+    const rows = await (query as any).select(columns).execute();
+    return rows as Pick<Selectable<Database[TTable]>, K>[];
+  }
+
+  async findById(id: unknown): Promise<Selectable<Database[TTable]> | undefined> {
     const row = await this.db
       .selectFrom(this.tableName as any)
       .where("id" as any, "=", id)
@@ -125,7 +148,17 @@ export class Repository<TTable extends keyof Database>
     return row as Selectable<Database[TTable]> | undefined;
   }
 
-  async findOne<T extends {}>(
+  async findByIdOrFail(id: unknown): Promise<Selectable<Database[TTable]>> {
+    const record = await this.findById(id);
+    if (!record) {
+      throw new NotFoundError(
+        `${String(this.tableName)} with id ${String(id)} not found`,
+      );
+    }
+    return record;
+  }
+
+  async findOne<T extends object>(
     conditions: SelectQueryCondition<T>,
   ): Promise<Selectable<Database[TTable]> | undefined> {
     let query = this.db.selectFrom(this.tableName as any);
@@ -133,6 +166,16 @@ export class Repository<TTable extends keyof Database>
 
     const row = await query.selectAll().executeTakeFirst();
     return row as Selectable<Database[TTable]> | undefined;
+  }
+
+  async findOneOrFail<T extends object>(
+    conditions: SelectQueryCondition<T>,
+  ): Promise<Selectable<Database[TTable]>> {
+    const record = await this.findOne(conditions);
+    if (!record) {
+      throw new NotFoundError(`${String(this.tableName)} record not found`);
+    }
+    return record;
   }
 
   async findAll(): Promise<Selectable<Database[TTable]>[]> {
@@ -143,7 +186,7 @@ export class Repository<TTable extends keyof Database>
     return rows as Selectable<Database[TTable]>[];
   }
 
-  async findPaginated<T extends {}>(
+  async findPaginated<T extends object>(
     page: number,
     pageSize: number,
     conditions?: SelectQueryCondition<T>,
@@ -154,8 +197,18 @@ export class Repository<TTable extends keyof Database>
     page: number;
     pageSize: number;
   }> {
+    const offset = (page - 1) * pageSize;
+
+    let query = this.db.selectFrom(this.tableName as any);
+    query = this.applyConditions(query, conditions);
+
     const [items, totalCount] = await Promise.all([
-      this.find(conditions),
+      query
+        .selectAll()
+        .limit(pageSize)
+        .offset(offset)
+        .execute()
+        .then((rows) => rows as Selectable<Database[TTable]>[]),
       this.count(conditions),
     ]);
 
@@ -170,33 +223,39 @@ export class Repository<TTable extends keyof Database>
     };
   }
 
-  async count<T extends {}>(
-    conditions?: SelectQueryCondition<T>,
-  ): Promise<number> {
+  async count<T extends object>(conditions?: SelectQueryCondition<T>): Promise<number> {
     let query = this.db
       .selectFrom(this.tableName as any)
       .select((eb) => eb.fn.count<number>("id").as("count"));
     query = this.applyConditions(query, conditions);
 
-    const [{ count }] = await query.execute();
-    return Number(count) ?? 0;
+    const result = await query.executeTakeFirst();
+    return Number(result?.count) ?? 0;
   }
 
   async exists(id: unknown): Promise<boolean> {
-    const [{ count }] = await this.db
+    const row = await this.db
       .selectFrom(this.tableName as any)
-      .select((eb) => eb.fn.count<number>("id").as("count"))
+      .select(this.db.fn<number>("1").as("exists"))
       .where("id" as any, "=", id)
-      .execute();
+      .limit(1)
+      .executeTakeFirst();
 
-    return (Number(count) ?? 0) > 0;
+    return !!row;
   }
 
-  async existsBy<T extends {}>(
+  async existsBy<T extends object>(
     conditions: SelectQueryCondition<T>,
   ): Promise<boolean> {
-    const count = await this.count(conditions);
-    return count > 0;
+    let query = this.db.selectFrom(this.tableName as any);
+    query = this.applyConditions(query, conditions);
+
+    const row = await query
+      .select(this.db.fn<number>("1").as("exists"))
+      .limit(1)
+      .executeTakeFirst();
+
+    return !!row;
   }
 
   async deleteById(id: unknown): Promise<DeleteResult[]> {
@@ -208,7 +267,7 @@ export class Repository<TTable extends keyof Database>
     return result;
   }
 
-  async deleteMany<T extends {}>(
+  async deleteMany<T extends object>(
     conditions: DeleteQueryCondition<T>,
   ): Promise<DeleteResult[]> {
     let query = this.db.deleteFrom(this.tableName as any);
@@ -231,7 +290,7 @@ export class Repository<TTable extends keyof Database>
     return row as Selectable<Database[TTable]> | undefined;
   }
 
-  async updateMany<T extends {}>(
+  async updateMany<T extends object>(
     conditions: UpdateQueryCondition<T>,
     data: Updateable<Database[TTable]>,
   ): Promise<Selectable<Database[TTable]>[]> {
@@ -264,5 +323,24 @@ export class Repository<TTable extends keyof Database>
       .execute();
 
     return rows as Selectable<Database[TTable]>[];
+  }
+
+  async upsert(
+    data: Insertable<Database[TTable]>,
+    conflictColumns: (keyof Selectable<Database[TTable]>)[],
+    updateData?: Partial<Insertable<Database[TTable]>>,
+  ): Promise<Selectable<Database[TTable]> | undefined> {
+    const dataToUpdate = updateData ?? data;
+
+    const row = await this.db
+      .insertInto(this.tableName as any)
+      .values(data)
+      .onConflict((oc) =>
+        oc.columns(conflictColumns as any).doUpdateSet(dataToUpdate as any),
+      )
+      .returningAll()
+      .executeTakeFirst();
+
+    return row as Selectable<Database[TTable]> | undefined;
   }
 }
