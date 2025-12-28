@@ -327,6 +327,29 @@ export const deleteUser = adminProcedure
   - Logic is complex or involves multiple operations
   - OR Logic is reused in multiple places
 
+**Cross-Repository Access:**
+
+Repositories can access other repositories via `this.repos` for complex operations that span multiple tables:
+
+````typescript
+// src/lib/db/repositories/order.repo.ts
+export class OrderRepository extends Repository<"order"> {
+  async createOrderWithItems(
+    orderData: OrderInsert,
+    items: OrderItemInsert[],
+  ) {
+    // Access other repositories via this.repos
+    const order = await this.insertReturn(orderData);
+    if (!order) throw new Error("Failed to create order");
+
+    // Use another repository
+    const orderItems = await (this.repos.orderItem as OrderItemRepository)
+      .insertMany(items.map((item) => ({ ...item, orderId: order.id })));
+
+    return { order, orderItems };
+  }
+}
+
 **Bad Example (don't do this):**
 
 ```typescript
@@ -343,7 +366,7 @@ export class TodoItemRepository extends Repository<"todoItem"> {
 
 // Usage - just use find directly instead
 const todos = await repos.todoItem.find({ userId: "123" });
-```
+````
 
 **Good Example (do this):**
 

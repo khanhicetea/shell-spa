@@ -9,6 +9,7 @@ import type {
 } from "kysely";
 import type { DB } from "../init";
 import type { Database } from "../schema";
+import type { Repositories } from ".";
 
 export class NotFoundError extends Error {
   constructor(message: string) {
@@ -88,10 +89,30 @@ export interface BaseRepository<TTable extends keyof Database> {
 }
 
 export class Repository<TTable extends keyof Database> implements BaseRepository<TTable> {
+  protected _repos: Repositories | null = null;
+
   constructor(
     protected db: DB,
     protected tableName: TTable,
   ) {}
+
+  /**
+   * Set the repos reference for cross-repository access.
+   * Called by createRepos after all repositories are instantiated.
+   */
+  setRepos(repos: Repositories): void {
+    this._repos = repos;
+  }
+
+  /**
+   * Access other repositories. Throws if repos not yet initialized.
+   */
+  protected get repos(): Repositories {
+    if (!this._repos) {
+      throw new Error("Repos not initialized. Make sure createRepos() was called.");
+    }
+    return this._repos;
+  }
 
   protected applyConditions<T>(
     query: any,

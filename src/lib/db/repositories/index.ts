@@ -6,11 +6,16 @@ import { TodoItemRepository } from "./todoItem.repo";
 export type Repositories = ReturnType<typeof createRepos>;
 
 export function createRepos(db: DB) {
-  return {
+  const repos = {
     user: new UserRepository(db),
     todoCategory: new TodoCategoryRepository(db),
     todoItem: new TodoItemRepository(db),
   };
+
+  // Inject repos reference into each repository for cross-repository access
+  Object.values(repos).forEach((repo) => repo.setRepos(repos));
+
+  return repos;
 }
 
 export { UserRepository } from "./user.repo";

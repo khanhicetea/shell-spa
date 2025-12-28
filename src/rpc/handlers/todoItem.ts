@@ -3,7 +3,8 @@ import { authedProcedure } from "../base";
 
 export const listTodos = authedProcedure.handler(async ({ context }) => {
   const { repos } = context;
-  return repos.todoItem.find({ userId: context.user.id });
+  return repos.todoItem.findTodoItemsByUserId(context.user.id);
+  // return repos.todoItem.find({ userId: context.user.id });
 });
 
 export const createTodo = authedProcedure
