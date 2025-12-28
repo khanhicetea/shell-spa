@@ -14,32 +14,33 @@ export type RequestContext = {
 // For Async Local Storage
 export const workerCtx = new AsyncLocalStorage<RequestContext>();
 
+export function getCurrentRequestContext() {
+  const ctx = workerCtx.getStore();
+  if (!ctx) throw new Error("No worker context");
+  return ctx;
+}
+
 export function getRequestHeaders() {
-  const store = workerCtx.getStore();
-  if (!store) throw new Error("No worker context");
-  return store.headers;
+  const ctx = getCurrentRequestContext();
+  return ctx.headers;
 }
 
 export function getCurrentDB() {
-  const store = workerCtx.getStore();
-  if (!store) throw new Error("No worker context");
-  return store.db;
+  const ctx = getCurrentRequestContext();
+  return ctx.db;
 }
 
 export function getCurrentAuth() {
-  const store = workerCtx.getStore();
-  if (!store) throw new Error("No worker context");
-  return store.auth;
+  const ctx = getCurrentRequestContext();
+  return ctx.auth;
 }
 
 export function getCurrentSession() {
-  const store = workerCtx.getStore();
-  if (!store) throw new Error("No worker context");
-  return store.session;
+  const ctx = getCurrentRequestContext();
+  return ctx.session;
 }
 
 export function getCurrentRepos() {
-  const store = workerCtx.getStore();
-  if (!store) throw new Error("No worker context");
-  return store.repos;
+  const ctx = getCurrentRequestContext();
+  return ctx.repos;
 }
