@@ -3,20 +3,6 @@ import { getAuthConfig } from "@/lib/auth/init";
 import { getDatabase } from "@/lib/db/init";
 import { workerCtx } from "./context";
 
-// Uncomment to enable Cloudflare Worker integration
-// export type CfRequestContext = {
-//   env: Env;
-//   waitUntil: (promise: Promise<unknown>) => void;
-//   passThroughOnException: () => void;
-// };
-// declare module "@tanstack/react-start" {
-//   interface Register {
-//     server: {
-//       requestContext: CfRequestContext;
-//     };
-//   }
-// }
-
 export function createCloudflareHandler(serverEntry: ServerEntry) {
   return {
     async fetch(request: Request, env: Env, ctx: ExecutionContext) {

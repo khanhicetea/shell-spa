@@ -1,14 +1,14 @@
-import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { todoItem as todoItemTable } from "@/lib/db/schema/todo.schema";
 import { authedProcedure } from "../base";
 
 export const listTodos = authedProcedure.handler(async ({ context }) => {
   const { db } = context;
-  const todos = await db.query.todoItem.findMany({
-    where: eq(todoItemTable.userId, context.user.id),
-    orderBy: [todoItemTable.createdAt],
-  });
+  const todos = await db
+    .selectFrom("todoItem")
+    .selectAll()
+    .where("userId", "=", context.user.id)
+    .orderBy("createdAt")
+    .execute();
   return todos;
 });
 
@@ -21,15 +21,18 @@ export const createTodo = authedProcedure
   )
   .handler(async ({ input, context }) => {
     const { db } = context;
-    const [newTodo] = await db
-      .insert(todoItemTable)
+    const newTodo = await db
+      .insertInto("todoItem")
       .values({
         id: crypto.randomUUID(),
         userId: context.user.id,
         categoryId: input.categoryId,
         content: input.content,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       })
-      .returning();
+      .returningAll()
+      .executeTakeFirstOrThrow();
     return newTodo;
   });
 
@@ -45,14 +48,21 @@ export const updateTodo = authedProcedure
   .handler(async ({ input, context }) => {
     const { db } = context;
     const { id, ...updates } = input;
-    const [updatedTodo] = await db
-      .update(todoItemTable)
+    const updatedTodo = await db
+      .updateTable("todoItem")
       .set({
-        ...updates,
+        ...(updates.content !== undefined && { content: updates.content }),
+        ...(updates.completedAt !== undefined && {
+          completedAt: updates.completedAt,
+        }),
+        ...(updates.categoryId !== undefined && {
+          categoryId: updates.categoryId,
+        }),
         updatedAt: new Date(),
       })
-      .where(eq(todoItemTable.id, id))
-      .returning();
+      .where("id", "=", id)
+      .returningAll()
+      .executeTakeFirstOrThrow();
     return updatedTodo;
   });
 
@@ -60,6 +70,6 @@ export const deleteTodo = authedProcedure
   .input(z.object({ id: z.string() }))
   .handler(async ({ input, context }) => {
     const { db } = context;
-    await db.delete(todoItemTable).where(eq(todoItemTable.id, input.id));
+    await db.deleteFrom("todoItem").where("id", "=", input.id).execute();
     return { success: true };
   });

@@ -25,7 +25,7 @@ export function createNodeHandler(serverEntry: ServerEntry) {
 
       return workerCtx.run(reqCtx, async () => {
         try {
-          return serverEntry.fetch(request);
+          return serverEntry.fetch(request, { context: undefined });
         } catch (error) {
           console.error(error);
           return new Response("Node Server Error", { status: 500 });

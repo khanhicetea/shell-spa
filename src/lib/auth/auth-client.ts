@@ -6,10 +6,10 @@ const authClient = createAuthClient({
   // baseURL: env.VITE_BASE_URL,
   plugins: [
     adminClient({
-      ac,
+      ac: ac as any,
       roles: {
-        admin,
-        user,
+        admin: admin as any,
+        user: user as any,
       },
     }),
   ],

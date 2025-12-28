@@ -7,7 +7,9 @@ import { tryAuthMiddleware } from "@/lib/middlewares";
 import { rpcRouter } from "@/rpc/router";
 
 const plugins = [
-  process.env.RPC_COMPRESSION !== undefined ? new CompressionPlugin() : undefined,
+  process.env.RPC_COMPRESSION !== undefined
+    ? new CompressionPlugin()
+    : undefined,
   new BatchHandlerPlugin(),
 ];
 
@@ -26,7 +28,9 @@ const handler = new RPCHandler(rpcRouter, {
         error.cause instanceof ValidationError
       ) {
         // If you only use Zod you can safely cast to ZodIssue[]
-        const zodError = new z.ZodError(error.cause.issues as z.core.$ZodIssue[]);
+        const zodError = new z.ZodError(
+          error.cause.issues as z.core.$ZodIssue[],
+        );
 
         throw new ORPCError("INPUT_VALIDATION_FAILED", {
           status: 422,
@@ -60,6 +64,7 @@ export const Route = createFileRoute("/api/rpc/$")({
             headers: request.headers,
             session: context.session,
             db: context.db,
+            auth: context.auth,
           },
         });
 
