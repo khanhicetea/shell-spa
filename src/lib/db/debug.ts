@@ -1,31 +1,42 @@
-/** biome-ignore-all lint/suspicious/noExplicitAny: for debugging purposes */
-import type { Pool } from "pg";
+import type {
+  KyselyPlugin,
+  PluginTransformQueryArgs,
+  PluginTransformResultArgs,
+  QueryResult,
+  RootOperationNode,
+} from "kysely";
 
-export const registerQueryTimeLogging = (pool: Pool) => {
-  const originalQuery = pool.query.bind(pool);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  pool.query = (...args: any[]): any => {
-    const startTime = Date.now();
+/**
+ * A Kysely plugin that logs the execution time of queries.
+ *
+ * Note: Kysely plugins operate on the AST (Abstract Syntax Tree) before compilation,
+ * so they don't have direct access to the final SQL string.
+ * For full SQL logging with timing, consider using Kysely's built-in `log` configuration.
+ */
+export class QueryLoggingPlugin implements KyselyPlugin {
+  private queryInfo = new WeakMap<object, { startTime: number; kind: string }>();
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const queryText =
-      typeof args[0] === "string"
-        ? args[0]
-        : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (args[0] as any)?.text || "Unknown query";
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const resultPromise = originalQuery(...(args as [any, any])) as Promise<any>;
+  transformQuery(args: PluginTransformQueryArgs): RootOperationNode {
+    this.queryInfo.set(args.queryId, {
+      startTime: Date.now(),
+      kind: args.node.kind,
+    });
+    return args.node;
+  }
 
-    return resultPromise
-      .then((res: unknown) => {
-        const duration = Date.now() - startTime;
-        console.log(`Query: ${queryText.substring(0, 50)}... took ${duration}ms`);
-        return res;
-      })
-      .catch((error) => {
-        const duration = Date.now() - startTime;
-        console.error(`Query: ${queryText} took ${duration}ms`);
-        throw error;
-      });
-  };
-};
+  async transformResult(args: PluginTransformResultArgs): Promise<QueryResult<any>> {
+    const info = this.queryInfo.get(args.queryId);
+
+    if (info) {
+      const duration = Date.now() - info.startTime;
+      console.log(`[Kysely] ${info.kind} query took ${duration}ms`);
+    }
+
+    return args.result;
+  }
+}
+
+/**
+ * Helper to create a new instance of the QueryLoggingPlugin.
+ */
+export const createQueryLoggingPlugin = () => new QueryLoggingPlugin();
