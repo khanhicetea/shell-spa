@@ -8,31 +8,20 @@ export const listUsers = adminProcedure
     }),
   )
   .handler(async ({ input, context }) => {
-    const { repos, db } = context;
+    const { repos } = context;
     const { page } = input;
-    const limit = 10;
-    const offset = (page - 1) * limit;
+    const pageSize = 10;
 
-    const [users, [{ count }]] = await Promise.all([
-      db
-        .selectFrom("user")
-        .selectAll()
-        .orderBy("createdAt", "desc")
-        .limit(limit)
-        .offset(offset)
-        .execute(),
-      db
-        .selectFrom("user")
-        .select((eb) => eb.fn.count<number>("id").as("count"))
-        .execute(),
-    ]);
+    const result = await repos.user.findPaginated(page, pageSize, (qb) =>
+      qb.orderBy("createdAt", "desc"),
+    );
 
     return {
-      users,
+      users: result.items,
       page,
-      pageSize: limit,
-      totalCount: Number(count) ?? 0,
-      pageCount: Math.ceil((Number(count) ?? 0) / limit),
+      pageSize: result.pageSize,
+      totalCount: result.totalCount,
+      pageCount: result.pageCount,
     };
   });
 

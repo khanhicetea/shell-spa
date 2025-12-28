@@ -16,4 +16,10 @@ export function createRepos(db: DB) {
 export { UserRepository } from "./user.repo";
 export { TodoCategoryRepository } from "./todoCategory.repo";
 export { TodoItemRepository } from "./todoItem.repo";
-export type { BaseRepository, Repository } from "./base";
+export type {
+  BaseRepository,
+  Repository,
+  SelectQueryCondition,
+  DeleteQueryCondition,
+  UpdateQueryCondition,
+} from "./base";
