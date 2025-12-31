@@ -6,6 +6,7 @@ import type {
   SelectQueryBuilder,
   Updateable,
   UpdateQueryBuilder,
+  ExpressionBuilder,
 } from "kysely";
 import type { DB } from "../init";
 import type { Database } from "../schema";
@@ -120,26 +121,27 @@ export class Repository<TTable extends keyof Database>
     return this._repos;
   }
 
-  protected applyConditions(
-    query: any,
+  protected applyConditions<Q>(
+    query: Q,
     conditions?:
       | SelectQueryCondition<TTable>
       | DeleteQueryCondition<TTable>
       | UpdateQueryCondition<TTable>,
-  ): any {
+  ): Q {
     if (!conditions) return query;
 
     if (typeof conditions === "function") {
-      return conditions(query);
+      return conditions(query as any) as Q;
     }
 
+    let result = query;
     if (Object.keys(conditions).length > 0) {
       for (const [key, value] of Object.entries(conditions)) {
-        query = query.where(key as any, "=", value);
+        result = (result as any).where(key, "=", value);
       }
     }
 
-    return query;
+    return result as Q;
   }
 
   async find(
@@ -249,8 +251,9 @@ export class Repository<TTable extends keyof Database>
   }
 
   async count(conditions?: SelectQueryCondition<TTable>): Promise<number> {
-    let query = (this.db.selectFrom(this.tableName) as any).select((eb: any) =>
-      eb.fn.count("id").as("count"),
+    let query = (this.db.selectFrom(this.tableName) as any).select(
+      (eb: ExpressionBuilder<Database, TTable>) =>
+        eb.fn.count<number>("id").as("count"),
     );
     query = this.applyConditions(query, conditions);
 
@@ -260,7 +263,7 @@ export class Repository<TTable extends keyof Database>
 
   async exists(id: unknown): Promise<boolean> {
     const row = await (this.db.selectFrom(this.tableName) as any)
-      .select(this.db.fn("1").as("exists"))
+      .select(this.db.fn<number>("1").as("exists"))
       .where("id", "=", id)
       .limit(1)
       .executeTakeFirst();
@@ -273,7 +276,7 @@ export class Repository<TTable extends keyof Database>
     query = this.applyConditions(query, conditions);
 
     const row = await query
-      .select(this.db.fn("1").as("exists"))
+      .select(this.db.fn<number>("1").as("exists"))
       .limit(1)
       .executeTakeFirst();
 
