@@ -19,7 +19,7 @@ shell-spa/
 │   ├── routes/             # File-based routing
 │   │   ├── (auth)/          # Public auth pages
 │   │   ├── (user)/          # Protected routes
-│   │   ├── (test)/          # Test routes
+│   │   ├── admin/          # Admin routes
 │   │   ├── api/             # API endpoints
 │   │   └── __root.tsx       # Shell implementation
 │   └── rpc/                # RPC procedures
