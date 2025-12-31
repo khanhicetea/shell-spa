@@ -1,4 +1,9 @@
-import type { UserTable, SessionTable, AccountTable, VerificationTable } from "./auth";
+import type {
+  UserTable,
+  SessionTable,
+  AccountTable,
+  VerificationTable,
+} from "./auth";
 import type { TodoCategoryTable, TodoItemTable } from "./todo";
 
 export interface Database {

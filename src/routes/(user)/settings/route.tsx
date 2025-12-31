@@ -1,4 +1,9 @@
-import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  useNavigate,
+} from "@tanstack/react-router";
 import { AuthUIProvider } from "@daveyplate/better-auth-ui";
 import authClient from "@/lib/auth/auth-client";
 import { Button } from "@/components/ui/button";

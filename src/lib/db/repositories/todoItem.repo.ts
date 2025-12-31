@@ -7,14 +7,6 @@ export class TodoItemRepository extends Repository<"todoItem"> {
   }
 
   async findTodoItemsByUserId(userId: string) {
-    const todoCategories = await this.repos.todoCategory.find({ userId });
-
-    return this.find((qb) =>
-      qb.where(
-        "categoryId",
-        "in",
-        todoCategories.map((tc) => tc.id),
-      ),
-    );
+    return this.find({ userId });
   }
 }

@@ -5,18 +5,30 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createTable("todo_category")
     .addColumn("id", "text", (col) => col.primaryKey())
     .addColumn("user_id", "text", (col) =>
-      col.notNull().references("user.id").onDelete("cascade").onUpdate("cascade"),
+      col
+        .notNull()
+        .references("user.id")
+        .onDelete("cascade")
+        .onUpdate("cascade"),
     )
     .addColumn("name", "text", (col) => col.notNull())
-    .addColumn("created_at", "timestamp", (col) => col.notNull().defaultTo("now()"))
-    .addColumn("updated_at", "timestamp", (col) => col.notNull().defaultTo("now()"))
+    .addColumn("created_at", "timestamp", (col) =>
+      col.notNull().defaultTo("now()"),
+    )
+    .addColumn("updated_at", "timestamp", (col) =>
+      col.notNull().defaultTo("now()"),
+    )
     .execute();
 
   await db.schema
     .createTable("todo_item")
     .addColumn("id", "text", (col) => col.primaryKey())
     .addColumn("user_id", "text", (col) =>
-      col.notNull().references("user.id").onDelete("cascade").onUpdate("cascade"),
+      col
+        .notNull()
+        .references("user.id")
+        .onDelete("cascade")
+        .onUpdate("cascade"),
     )
     .addColumn("category_id", "text", (col) =>
       col
@@ -27,8 +39,12 @@ export async function up(db: Kysely<any>): Promise<void> {
     )
     .addColumn("content", "text", (col) => col.notNull())
     .addColumn("completed_at", "timestamp")
-    .addColumn("created_at", "timestamp", (col) => col.notNull().defaultTo("now()"))
-    .addColumn("updated_at", "timestamp", (col) => col.notNull().defaultTo("now()"))
+    .addColumn("created_at", "timestamp", (col) =>
+      col.notNull().defaultTo("now()"),
+    )
+    .addColumn("updated_at", "timestamp", (col) =>
+      col.notNull().defaultTo("now()"),
+    )
     .execute();
 }
 

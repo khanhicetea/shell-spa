@@ -90,7 +90,9 @@ export interface BaseRepository<TTable extends keyof Database> {
   ): Promise<Selectable<Database[TTable]> | undefined>;
 }
 
-export class Repository<TTable extends keyof Database> implements BaseRepository<TTable> {
+export class Repository<TTable extends keyof Database>
+  implements BaseRepository<TTable>
+{
   protected _repos: Repositories | null = null;
 
   constructor(
@@ -111,7 +113,9 @@ export class Repository<TTable extends keyof Database> implements BaseRepository
    */
   protected get repos(): Repositories {
     if (!this._repos) {
-      throw new Error("Repos not initialized. Make sure createRepos() was called.");
+      throw new Error(
+        "Repos not initialized. Make sure createRepos() was called.",
+      );
     }
     return this._repos;
   }
@@ -161,7 +165,9 @@ export class Repository<TTable extends keyof Database> implements BaseRepository
     return rows as Pick<Selectable<Database[TTable]>, K>[];
   }
 
-  async findById(id: unknown): Promise<Selectable<Database[TTable]> | undefined> {
+  async findById(
+    id: unknown,
+  ): Promise<Selectable<Database[TTable]> | undefined> {
     const row = await (this.db.selectFrom(this.tableName) as any)
       .where("id", "=", id)
       .selectAll()
@@ -282,7 +288,9 @@ export class Repository<TTable extends keyof Database> implements BaseRepository
     return result;
   }
 
-  async deleteMany(conditions: DeleteQueryCondition<TTable>): Promise<DeleteResult[]> {
+  async deleteMany(
+    conditions: DeleteQueryCondition<TTable>,
+  ): Promise<DeleteResult[]> {
     let query = this.db.deleteFrom(this.tableName);
     query = this.applyConditions(query, conditions);
 

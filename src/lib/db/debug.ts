@@ -14,7 +14,10 @@ import type {
  * For full SQL logging with timing, consider using Kysely's built-in `log` configuration.
  */
 export class QueryLoggingPlugin implements KyselyPlugin {
-  private queryInfo = new WeakMap<object, { startTime: number; kind: string }>();
+  private queryInfo = new WeakMap<
+    object,
+    { startTime: number; kind: string }
+  >();
 
   transformQuery(args: PluginTransformQueryArgs): RootOperationNode {
     this.queryInfo.set(args.queryId, {
@@ -24,7 +27,9 @@ export class QueryLoggingPlugin implements KyselyPlugin {
     return args.node;
   }
 
-  async transformResult(args: PluginTransformResultArgs): Promise<QueryResult<any>> {
+  async transformResult(
+    args: PluginTransformResultArgs,
+  ): Promise<QueryResult<any>> {
     const info = this.queryInfo.get(args.queryId);
 
     if (info) {

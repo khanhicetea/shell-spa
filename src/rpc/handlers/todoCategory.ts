@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/client";
 import { z } from "zod";
 import { authedProcedure } from "../base";
 
@@ -31,9 +32,16 @@ export const updateCategory = authedProcedure
       name: z.string().min(1),
     }),
   )
-  .handler(async ({ input, context }) => {
+  .handler(async ({ input, context, errors }) => {
     const { repos } = context;
     const { id, ...updates } = input;
+
+    // Authorization: Verify the category belongs to the user
+    const existingCategory = await repos.todoCategory.findById(id);
+    if (!existingCategory || existingCategory.userId !== context.user.id) {
+      throw errors.NOT_FOUND();
+    }
+
     const updatedCategory = await repos.todoCategory.updateById(id, {
       ...updates,
       updatedAt: new Date(),
@@ -43,8 +51,15 @@ export const updateCategory = authedProcedure
 
 export const deleteCategory = authedProcedure
   .input(z.object({ id: z.string() }))
-  .handler(async ({ input, context }) => {
+  .handler(async ({ input, context, errors }) => {
     const { repos } = context;
+
+    // Authorization: Verify the category belongs to the user
+    const existingCategory = await repos.todoCategory.findById(input.id);
+    if (!existingCategory || existingCategory.userId !== context.user.id) {
+      throw errors.NOT_FOUND();
+    }
+
     await repos.todoCategory.deleteById(input.id);
     return { success: true };
   });

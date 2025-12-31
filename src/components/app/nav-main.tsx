@@ -1,5 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { HandFist, ListTodoIcon, type LucideIcon, SettingsIcon } from "lucide-react";
+import {
+  HandFist,
+  ListTodoIcon,
+  type LucideIcon,
+  SettingsIcon,
+} from "lucide-react";
 import {
   SidebarGroup,
   SidebarMenu,

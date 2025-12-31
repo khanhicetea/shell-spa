@@ -1,4 +1,7 @@
-import { AccountSettingsCards, SecuritySettingsCards } from "@daveyplate/better-auth-ui";
+import {
+  AccountSettingsCards,
+  SecuritySettingsCards,
+} from "@daveyplate/better-auth-ui";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(user)/settings/")({

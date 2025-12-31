@@ -1,4 +1,10 @@
-import type { ColumnType, Generated, Insertable, Selectable, Updateable } from "kysely";
+import type {
+  ColumnType,
+  Generated,
+  Insertable,
+  Selectable,
+  Updateable,
+} from "kysely";
 
 export interface TodoCategoryTable {
   id: Generated<string>;

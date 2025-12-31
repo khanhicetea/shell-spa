@@ -1,3 +1,4 @@
+import { ORPCError } from "@orpc/client";
 import { z } from "zod";
 import { authedProcedure } from "../base";
 
@@ -36,9 +37,16 @@ export const updateTodo = authedProcedure
       categoryId: z.string().optional(),
     }),
   )
-  .handler(async ({ input, context }) => {
+  .handler(async ({ input, context, errors }) => {
     const { repos } = context;
     const { id, ...updates } = input;
+
+    // Authorization: Verify the todo belongs to the user
+    const existingTodo = await repos.todoItem.findById(id);
+    if (!existingTodo || existingTodo.userId !== context.user.id) {
+      throw errors.NOT_FOUND();
+    }
+
     const updatedTodo = await repos.todoItem.updateById(id, {
       ...(updates.content !== undefined && { content: updates.content }),
       ...(updates.completedAt !== undefined && {
@@ -54,8 +62,15 @@ export const updateTodo = authedProcedure
 
 export const deleteTodo = authedProcedure
   .input(z.object({ id: z.string() }))
-  .handler(async ({ input, context }) => {
+  .handler(async ({ input, context, errors }) => {
     const { repos } = context;
+
+    // Authorization: Verify the todo belongs to the user
+    const existingTodo = await repos.todoItem.findById(input.id);
+    if (!existingTodo || existingTodo.userId !== context.user.id) {
+      throw errors.NOT_FOUND();
+    }
+
     await repos.todoItem.deleteById(input.id);
     return { success: true };
   });
