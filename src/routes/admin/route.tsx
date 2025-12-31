@@ -1,8 +1,8 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { DefaultCatchBoundary } from "@/components/spa/default-catch-boundary";
 import { ShellProgressBar } from "@/components/spa/shell-progress-bar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { authQueryOptions } from "@/lib/queries";
 
 export const Route = createFileRoute("/admin")({
@@ -14,7 +14,11 @@ export const Route = createFileRoute("/admin")({
       revalidateIfStale: true,
     });
 
-    if (!user || user.role !== "admin") {
+    if (!user) {
+      throw redirect({ to: "/login" });
+    }
+
+    if (user.role !== "admin") {
       throw redirect({ to: "/app" });
     }
 
