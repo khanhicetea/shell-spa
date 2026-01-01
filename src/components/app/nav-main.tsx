@@ -1,10 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import {
-  HandFist,
-  ListTodoIcon,
-  type LucideIcon,
-  SettingsIcon,
-} from "lucide-react";
+import { HandFist, ListTodoIcon, type LucideIcon } from "lucide-react";
 import {
   SidebarGroup,
   SidebarMenu,
@@ -35,18 +30,20 @@ export function NavMain() {
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
-            <SidebarMenuButton tooltip={item.title} asChild>
-              <Link
-                viewTransition
-                to={item.url}
-                activeProps={{
-                  "data-active": "true",
-                }}
-              >
-                {item.icon && <item.icon />}
-                <span>{item.title}</span>
-              </Link>
-            </SidebarMenuButton>
+            <SidebarMenuButton
+              render={
+                <Link
+                  viewTransition
+                  to={item.url}
+                  activeProps={{
+                    "data-active": "true",
+                  }}
+                >
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </Link>
+              }
+            />
           </SidebarMenuItem>
         ))}
       </SidebarMenu>

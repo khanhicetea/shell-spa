@@ -18,9 +18,12 @@ function HomePage() {
         <p className="text-muted-foreground max-w-md">
           A minimal starter with SSR shell for auth and SPA for everything else
         </p>
-        <Button type="button" asChild className="w-fit" size="lg">
-          <Link to="/app/hello-form">Go to Hello Form</Link>
-        </Button>
+        <Button
+          type="button"
+          className="w-fit"
+          size="lg"
+          render={<Link to="/app/hello-form">Go to Hello Form</Link>}
+        />
       </div>
 
       <Suspense fallback={<div className="py-6">Loading user...</div>}>
@@ -40,17 +43,23 @@ function UserAction() {
   return user ? (
     <div className="flex flex-col items-center gap-4">
       <p className="text-lg">Welcome back, {user.name}!</p>
-      <Button type="button" asChild className="w-fit" size="lg">
-        <Link to="/app">Go to App Home</Link>
-      </Button>
+      <Button
+        type="button"
+        className="w-fit"
+        size="lg"
+        render={<Link to="/app">Go to App Home</Link>}
+      />
       <SignOutButton />
     </div>
   ) : (
     <div className="flex flex-col items-center gap-4">
       <p className="text-lg">You are not signed in.</p>
-      <Button type="button" asChild className="w-fit" size="lg">
-        <Link to="/login">Log in</Link>
-      </Button>
+      <Button
+        type="button"
+        className="w-fit"
+        size="lg"
+        render={<Link to="/login">Log in</Link>}
+      />
     </div>
   );
 }

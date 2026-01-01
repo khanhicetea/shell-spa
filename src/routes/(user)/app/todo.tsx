@@ -355,20 +355,22 @@ function TodoCard({
       <CardContent className="p-3">
         <div className="flex items-start gap-3">
           <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="pt-0.5">
-                <Checkbox
-                  checked={!!todo.completedAt}
-                  onCheckedChange={handleToggleComplete}
-                  disabled={updateMutation.isPending}
-                  className={`h-5 w-5 rounded-full transition-all ${
-                    todo.completedAt
-                      ? "border-emerald-500 bg-emerald-500 text-white"
-                      : "border-muted-foreground/40 hover:border-primary"
-                  }`}
-                />
-              </div>
-            </TooltipTrigger>
+            <TooltipTrigger
+              render={
+                <div className="pt-0.5">
+                  <Checkbox
+                    checked={!!todo.completedAt}
+                    onCheckedChange={handleToggleComplete}
+                    disabled={updateMutation.isPending}
+                    className={`h-5 w-5 rounded-full transition-all ${
+                      todo.completedAt
+                        ? "border-emerald-500 bg-emerald-500 text-white"
+                        : "border-muted-foreground/40 hover:border-primary"
+                    }`}
+                  />
+                </div>
+              }
+            />
             <TooltipContent>
               {todo.completedAt ? "Mark as incomplete" : "Mark as complete"}
             </TooltipContent>
@@ -415,32 +417,36 @@ function TodoCard({
         {/* Action Buttons */}
         <div className="absolute top-1.5 right-1.5 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0 cursor-grab active:cursor-grabbing hover:bg-muted"
-                {...listeners}
-                {...attributes}
-              >
-                <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
-              </Button>
-            </TooltipTrigger>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 cursor-grab active:cursor-grabbing hover:bg-muted"
+                  {...listeners}
+                  {...attributes}
+                >
+                  <GripVertical className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
+              }
+            />
             <TooltipContent>Drag to move</TooltipContent>
           </Tooltip>
 
           <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleDelete}
-                disabled={deleteMutation.isPending}
-                className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </Button>
-            </TooltipTrigger>
+            <TooltipTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleDelete}
+                  disabled={deleteMutation.isPending}
+                  className="h-7 w-7 p-0 hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              }
+            />
             <TooltipContent>Delete task</TooltipContent>
           </Tooltip>
         </div>
@@ -577,17 +583,19 @@ function CategoryColumn({
               </Badge>
               {todos.length === 0 && (
                 <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleDeleteCategory}
-                      disabled={deleteCategoryMutation.isPending}
-                      className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-destructive/10 hover:text-destructive"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </TooltipTrigger>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleDeleteCategory}
+                        disabled={deleteCategoryMutation.isPending}
+                        className="h-6 w-6 p-0 opacity-60 hover:opacity-100 hover:bg-destructive/10 hover:text-destructive"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    }
+                  />
                   <TooltipContent>Delete category</TooltipContent>
                 </Tooltip>
               )}

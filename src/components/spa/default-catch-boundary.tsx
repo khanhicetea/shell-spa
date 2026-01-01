@@ -17,9 +17,7 @@ export function UnauthorizedError() {
         <EmptyDescription>
           You don't have permission to access this page.
         </EmptyDescription>
-        <Button variant="default" asChild>
-          <Link to="/">Back to Home</Link>
-        </Button>
+        <Button variant="default" render={<Link to="/">Back to Home</Link>} />
       </EmptyHeader>
     </Empty>
   );
@@ -49,21 +47,22 @@ export function DefaultCatchBoundary({ error }: Readonly<ErrorComponentProps>) {
           Try Again
         </Button>
         {isRoot ? (
-          <Button asChild variant="secondary">
-            <Link to="/">Home</Link>
-          </Button>
+          <Button variant="secondary" render={<Link to="/">Home</Link>} />
         ) : (
-          <Button asChild variant="secondary">
-            <Link
-              to="/"
-              onClick={(e) => {
-                e.preventDefault();
-                window.history.back();
-              }}
-            >
-              Go Back
-            </Link>
-          </Button>
+          <Button
+            variant="secondary"
+            render={
+              <Link
+                to="/"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.history.back();
+                }}
+              >
+                Go Back
+              </Link>
+            }
+          />
         )}
       </div>
     </div>

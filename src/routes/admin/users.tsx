@@ -20,7 +20,7 @@ import {
   Trash2Icon,
   UserSearchIcon,
 } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactElement, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -593,7 +593,7 @@ function CreateUserForm({
   trigger,
   onSuccess,
 }: {
-  trigger: ReactNode;
+  trigger: ReactElement;
   onSuccess: (user: UserWithRole) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -634,7 +634,7 @@ function CreateUserForm({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>{trigger}</SheetTrigger>
+      <SheetTrigger render={trigger} />
       <SheetContent>
         <Form {...form}>
           <form
