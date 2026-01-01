@@ -1,5 +1,11 @@
 {
   "permissions": {
-    "allow": ["Bash(cat:*)", "Bash(pnpm check:*)", "Bash(pnpm check-types:*)"]
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(pnpm check:*)",
+      "Bash(pnpm check-types:*)",
+      "WebFetch(domain:better-upload.com)",
+      "Bash(pnpm add:*)"
+    ]
   }
 }

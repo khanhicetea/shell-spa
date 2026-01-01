@@ -11,6 +11,12 @@ export const env = createEnv({
     // GITHUB_CLIENT_SECRET: z.string().optional(),
     // GOOGLE_CLIENT_ID: z.string().optional(),
     // GOOGLE_CLIENT_SECRET: z.string().optional(),
+    // S3 configuration for better-upload
+    S3_ENDPOINT: z.string().optional(),
+    S3_ACCESS_KEY_ID: z.string().optional(),
+    S3_SECRET_ACCESS_KEY: z.string().optional(),
+    S3_BUCKET_NAME: z.string().optional(),
+    S3_REGION: z.string().optional(),
   },
   runtimeEnv: process.env,
 });

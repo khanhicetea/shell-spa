@@ -21,6 +21,7 @@ import { Route as userSettingsRouteRouteImport } from './routes/(user)/settings/
 import { Route as userAppRouteRouteImport } from './routes/(user)/app/route'
 import { Route as userSettingsIndexRouteImport } from './routes/(user)/settings/index'
 import { Route as userAppIndexRouteImport } from './routes/(user)/app/index'
+import { Route as ApiUploadSplatRouteImport } from './routes/api/upload.$'
 import { Route as ApiRpcSplatRouteImport } from './routes/api/rpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
 import { Route as userAppTodoRouteImport } from './routes/(user)/app/todo'
@@ -84,6 +85,11 @@ const userAppIndexRoute = userAppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => userAppRouteRoute,
 } as any)
+const ApiUploadSplatRoute = ApiUploadSplatRouteImport.update({
+  id: '/api/upload/$',
+  path: '/api/upload/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
   id: '/api/rpc/$',
   path: '/api/rpc/$',
@@ -118,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/app/todo': typeof userAppTodoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/api/upload/$': typeof ApiUploadSplatRoute
   '/app/': typeof userAppIndexRoute
   '/settings/': typeof userSettingsIndexRoute
 }
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/app/todo': typeof userAppTodoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/api/upload/$': typeof ApiUploadSplatRoute
   '/app': typeof userAppIndexRoute
   '/settings': typeof userSettingsIndexRoute
 }
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/(user)/app/todo': typeof userAppTodoRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/rpc/$': typeof ApiRpcSplatRoute
+  '/api/upload/$': typeof ApiUploadSplatRoute
   '/(user)/app/': typeof userAppIndexRoute
   '/(user)/settings/': typeof userSettingsIndexRoute
 }
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/app/todo'
     | '/api/auth/$'
     | '/api/rpc/$'
+    | '/api/upload/$'
     | '/app/'
     | '/settings/'
   fileRoutesByTo: FileRoutesByTo
@@ -181,6 +191,7 @@ export interface FileRouteTypes {
     | '/app/todo'
     | '/api/auth/$'
     | '/api/rpc/$'
+    | '/api/upload/$'
     | '/app'
     | '/settings'
   id:
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/(user)/app/todo'
     | '/api/auth/$'
     | '/api/rpc/$'
+    | '/api/upload/$'
     | '/(user)/app/'
     | '/(user)/settings/'
   fileRoutesById: FileRoutesById
@@ -210,6 +222,7 @@ export interface RootRouteChildren {
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiRpcSplatRoute: typeof ApiRpcSplatRoute
+  ApiUploadSplatRoute: typeof ApiUploadSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -297,6 +310,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/'
       preLoaderRoute: typeof userAppIndexRouteImport
       parentRoute: typeof userAppRouteRoute
+    }
+    '/api/upload/$': {
+      id: '/api/upload/$'
+      path: '/api/upload/$'
+      fullPath: '/api/upload/$'
+      preLoaderRoute: typeof ApiUploadSplatRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/rpc/$': {
       id: '/api/rpc/$'
@@ -405,6 +425,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRouteRoute: AdminRouteRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiRpcSplatRoute: ApiRpcSplatRoute,
+  ApiUploadSplatRoute: ApiUploadSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,5 +1,8 @@
+import { useUploadFiles } from "@better-upload/client";
 import { useMutation } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { Upload, X } from "lucide-react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -37,8 +40,9 @@ function RouteComponent() {
   );
 
   return (
-    <div className="p-4">
+    <div className="p-4 space-y-8">
       <div className="max-w-md mx-auto p-4 rounded-lg shadow-md">
+        <h2 className="mb-4 font-semibold">Hello Form</h2>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(async (data) => {
@@ -78,6 +82,139 @@ function RouteComponent() {
             </div>
           </form>
         </Form>
+      </div>
+
+      <ImageUploadForm />
+    </div>
+  );
+}
+
+function ImageUploadForm() {
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { upload, progresses, isPending } = useUploadFiles({
+    route: "images",
+    api: "/api/upload",
+    onUploadComplete: ({ files }) => {
+      toast.success(`Successfully uploaded ${files.length} image(s)`);
+
+      // Clear files
+      setSelectedFiles([]);
+      setPreviews([]);
+    },
+    onUploadFail: ({ failedFiles }) => {
+      for (const file of failedFiles) {
+        toast.error(`Failed to upload ${file.raw.name}`);
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "Upload failed");
+    },
+  });
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const imageFiles = files.filter((file) => file.type.startsWith("image/"));
+
+    setSelectedFiles((prev) => [...prev, ...imageFiles]);
+
+    // Generate previews
+    imageFiles.forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviews((prev) => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleUpload = () => {
+    if (selectedFiles.length === 0) {
+      toast.error("Please select at least one image");
+      return;
+    }
+
+    upload(selectedFiles);
+  };
+
+  return (
+    <div className="max-w-md mx-auto p-4 rounded-lg shadow-md">
+      <h2 className="mb-4 font-semibold">Image Upload</h2>
+
+      <div className="space-y-4">
+        <div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFileSelect}
+            className="hidden"
+            id="image-upload"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            className="w-full"
+          >
+            <Upload className="mr-2 size-4" />
+            Select Images
+          </Button>
+        </div>
+
+        {selectedFiles.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              {selectedFiles.length} image(s) selected
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {previews.map((preview, index) => (
+                <div key={index} className="group relative aspect-square">
+                  <img
+                    src={preview}
+                    alt={selectedFiles[index].name}
+                    className="size-full rounded object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeFile(index)}
+                    className="absolute -right-2 -top-2 rounded-full bg-destructive p-1 opacity-0 transition-opacity group-hover:opacity-100"
+                  >
+                    <X className="size-3 text-destructive-foreground" />
+                  </button>
+                  {isPending && progresses[index] !== undefined && (
+                    <div className="absolute inset-0 flex items-center justify-center rounded bg-black/50">
+                      <span className="text-sm font-semibold text-white">
+                        {Math.round(progresses[index].progress * 100)}%
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <Button
+          onClick={handleUpload}
+          disabled={selectedFiles.length === 0 || isPending}
+          className="w-full"
+        >
+          {isPending ? "Uploading..." : "Upload Images"}
+        </Button>
       </div>
     </div>
   );
