@@ -12,9 +12,11 @@ export const listUsers = adminProcedure
     const { page } = input;
     const pageSize = 10;
 
-    const result = await repos.user.findPaginated(page, pageSize, (qb) =>
-      qb.orderBy("createdAt", "desc"),
-    );
+    const result = await repos.user.findPaginated({
+      page,
+      pageSize,
+      modify: (qb) => qb.orderBy("createdAt", "desc"),
+    });
 
     return {
       users: result.items,
