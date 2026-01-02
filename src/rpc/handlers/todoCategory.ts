@@ -3,7 +3,7 @@ import { authedProcedure } from "../base";
 
 export const listCategories = authedProcedure.handler(async ({ context }) => {
   const { repos } = context;
-  return repos.todoCategory.find({ userId: context.user.id });
+  return repos.todoCategory.find({ where: { userId: context.user.id } });
 });
 
 export const createCategory = authedProcedure
@@ -41,9 +41,12 @@ export const updateCategory = authedProcedure
       throw errors.NOT_FOUND();
     }
 
-    const updatedCategory = await repos.todoCategory.updateById(id, {
-      ...updates,
-      updatedAt: new Date(),
+    const updatedCategory = await repos.todoCategory.updateById({
+      id,
+      data: {
+        ...updates,
+        updatedAt: new Date(),
+      },
     });
     return updatedCategory ?? null;
   });

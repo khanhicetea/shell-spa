@@ -46,15 +46,18 @@ export const updateTodo = authedProcedure
       throw errors.NOT_FOUND();
     }
 
-    const updatedTodo = await repos.todoItem.updateById(id, {
-      ...(updates.content !== undefined && { content: updates.content }),
-      ...(updates.completedAt !== undefined && {
-        completedAt: updates.completedAt,
-      }),
-      ...(updates.categoryId !== undefined && {
-        categoryId: updates.categoryId,
-      }),
-      updatedAt: new Date(),
+    const updatedTodo = await repos.todoItem.updateById({
+      id,
+      data: {
+        ...(updates.content !== undefined && { content: updates.content }),
+        ...(updates.completedAt !== undefined && {
+          completedAt: updates.completedAt,
+        }),
+        ...(updates.categoryId !== undefined && {
+          categoryId: updates.categoryId,
+        }),
+        updatedAt: new Date(),
+      },
     });
     return updatedTodo ?? null;
   });

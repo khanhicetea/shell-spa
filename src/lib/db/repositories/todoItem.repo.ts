@@ -7,6 +7,6 @@ export class TodoItemRepository extends Repository<"todoItem"> {
   }
 
   async findTodoItemsByUserId(userId: string) {
-    return this.find({ userId });
+    return this.find({ where: { userId } });
   }
 }
